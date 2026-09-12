@@ -10,8 +10,11 @@ Most web-based résumé builders emit PDFs that are secretly images and Word fil
 
 Because the whole app is a single web bundle with no external calls, it runs offline as a PWA, installs on Android via [Capacitor](https://capacitorjs.com/), and stores multiple profiles (yours, your family's, your friends') locally in IndexedDB. Switching between the 11 built-in formats reuses your existing profile data — a second résumé takes about a minute.
 
+![Format gallery with flair filters, live sample-data previews and per-template ATS grade](./docs/screenshots/gallery.png)
+
 ## Table of Contents
 
+- [Screenshots](#screenshots)
 - [Background](#background)
 - [Install](#install)
   - [Web](#web)
@@ -23,6 +26,24 @@ Because the whole app is a single web bundle with no external calls, it runs off
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Screenshots
+
+The gap-diffing wizard, showing why the second résumé is fast — the profile already covers education, experience, projects and skills, so the NIT Jamshedpur template asks only for the three sections its layout renders that the profile does not have:
+
+![Wizard step 1 of 3 for NIT Jamshedpur: only the Positions section is being requested](./docs/screenshots/wizard.png)
+
+The editor with live, physically-sized preview. The preview scales rather than reflows, so its line breaks and page boundaries match the printed PDF exactly:
+
+![Editor with Jake's Resume template rendering seeded profile data](./docs/screenshots/editor-jake.png)
+
+The same profile switched to the Harvard OCS layout. The blue panel at the top surfaces sections the profile has that this format's layout drops, so nothing is silently lost:
+
+![Editor with Harvard OCS template, showing the dropped-sections warning](./docs/screenshots/editor-harvard.png)
+
+Multi-profile management. Everything is stored locally; the "Back up all" and per-profile "Export" buttons emit plain JSON:
+
+![Profiles page with completeness ring and duplicate / export / delete actions](./docs/screenshots/profiles.png)
 
 ## Background
 
