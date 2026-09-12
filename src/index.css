@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* Safe-area padding so the nav clears the notch when installed on iOS. */
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Stops iOS Safari zooming in when a form field is focused. */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}

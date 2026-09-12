@@ -1,0 +1,458 @@
+/* ---------------------------------------------------------------------------
+   Resume document styles.
+   Everything here is print-first: sizes are in pt/mm so that what the preview
+   shows is literally what the PDF measures. The app chrome uses Tailwind; this
+   file is deliberately plain CSS so it can be inlined for printing and image
+   export without pulling the utility sheet along.
+   --------------------------------------------------------------------------- */
+
+.rf-page {
+  --rf-accent: #1a1a1a;
+  --rf-text: #1a1a1a;
+  --rf-muted: #444;
+  --rf-rule: #999;
+  --rf-pad: 14mm;
+  --rf-size: 10pt;
+  --rf-lead: 1.32;
+  --rf-gap: 3.6mm;
+
+  width: 210mm;
+  min-height: 297mm;
+  padding: var(--rf-pad);
+  box-sizing: border-box;
+  background: #fff;
+  color: var(--rf-text);
+  font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  font-size: var(--rf-size);
+  line-height: var(--rf-lead);
+  text-align: left;
+  /* Selectable, real text — never a canvas. This is what keeps parsers happy. */
+  -webkit-font-smoothing: antialiased;
+}
+
+.rf-page.rf-letter {
+  width: 216mm;
+  min-height: 279mm;
+}
+
+.rf-page * {
+  box-sizing: border-box;
+}
+
+.rf-page p {
+  margin: 0;
+}
+
+.rf-section {
+  margin-top: var(--rf-gap);
+}
+
+.rf-section:first-of-type {
+  margin-top: 0;
+}
+
+.rf-h1 {
+  margin: 0;
+  font-size: 20pt;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.rf-h2 {
+  margin: 0 0 1.4mm;
+  font-size: 10.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rf-accent);
+}
+
+.rf-h3 {
+  margin: 0;
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+
+.rf-rule {
+  height: 0;
+  border-bottom: 0.5pt solid var(--rf-rule);
+  margin: 0 0 1.6mm;
+}
+
+.rf-muted {
+  color: var(--rf-muted);
+}
+
+.rf-small {
+  font-size: 9pt;
+}
+
+.rf-italic {
+  font-style: italic;
+}
+
+.rf-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 0.4pt solid #bbb;
+}
+
+.rf-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6mm;
+}
+
+.rf-row-right {
+  flex: 0 0 auto;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 9.5pt;
+  color: var(--rf-muted);
+}
+
+.rf-row-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rf-entry {
+  margin-bottom: 2.4mm;
+  /* Keeps a role and its bullets from being split across pages. */
+  break-inside: avoid;
+}
+
+.rf-entry:last-child {
+  margin-bottom: 0;
+}
+
+.rf-bullets {
+  margin: 0.8mm 0 0;
+  padding-left: 4.6mm;
+  list-style-type: disc;
+}
+
+.rf-bullets li {
+  margin-bottom: 0.5mm;
+}
+
+.rf-bullets li::marker {
+  font-size: 0.85em;
+}
+
+.rf-inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 2.5mm;
+}
+
+.rf-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 2.4mm;
+  font-size: 9.5pt;
+  color: var(--rf-muted);
+}
+
+.rf-contact > span:not(:last-child)::after {
+  content: '•';
+  margin-left: 2.4mm;
+  color: #aaa;
+}
+
+.rf-skill-row {
+  display: flex;
+  gap: 2mm;
+  margin-bottom: 0.8mm;
+}
+
+.rf-skill-cat {
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.rf-two-col {
+  display: flex;
+  gap: 7mm;
+  align-items: flex-start;
+}
+
+.rf-col-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rf-col-side {
+  flex: 0 0 58mm;
+  min-width: 0;
+}
+
+.rf-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rf-table th,
+.rf-table td {
+  border: 0.5pt solid #666;
+  padding: 1.1mm 1.8mm;
+  text-align: left;
+  font-size: 9.5pt;
+  vertical-align: top;
+}
+
+.rf-table th {
+  font-weight: 700;
+  background: #f0f0f0;
+}
+
+/* --- Sans-serif family ---------------------------------------------------- */
+
+.rf-sans {
+  font-family: 'Inter', Calibri, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* --- Template: Jake ------------------------------------------------------- */
+
+.rf-jake {
+  --rf-pad: 12mm;
+  --rf-size: 10pt;
+}
+
+.rf-jake .rf-head {
+  text-align: center;
+  margin-bottom: 3mm;
+}
+
+.rf-jake .rf-h2 {
+  border-bottom: 0.6pt solid #000;
+  padding-bottom: 0.8mm;
+  letter-spacing: 0.06em;
+}
+
+/* --- Template: Deedy two-column ------------------------------------------- */
+
+.rf-deedy {
+  --rf-accent: #0b7285;
+  --rf-pad: 13mm;
+  --rf-size: 9.6pt;
+}
+
+.rf-deedy .rf-h1 {
+  font-weight: 300;
+  font-size: 22pt;
+}
+
+.rf-deedy .rf-h1 strong {
+  font-weight: 700;
+}
+
+.rf-deedy .rf-h2 {
+  font-size: 10pt;
+  letter-spacing: 0.14em;
+  border-bottom: 0.6pt solid #ddd;
+  padding-bottom: 0.7mm;
+}
+
+/* --- Template: Harvard ---------------------------------------------------- */
+
+.rf-harvard {
+  --rf-pad: 16mm;
+  --rf-size: 10.5pt;
+  --rf-lead: 1.28;
+}
+
+.rf-harvard .rf-head {
+  text-align: center;
+  margin-bottom: 3.5mm;
+}
+
+.rf-harvard .rf-h1 {
+  font-size: 16pt;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.rf-harvard .rf-h2 {
+  border-bottom: 0.6pt solid #000;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.6mm;
+}
+
+/* --- Template: MIT -------------------------------------------------------- */
+
+.rf-mit {
+  --rf-pad: 14mm;
+  --rf-size: 10pt;
+  --rf-accent: #750014;
+}
+
+.rf-mit .rf-h1 {
+  font-size: 17pt;
+  font-weight: 700;
+}
+
+.rf-mit .rf-h2 {
+  border-bottom: 1pt solid var(--rf-accent);
+  padding-bottom: 0.6mm;
+}
+
+/* --- Template: IIT Bombay ------------------------------------------------- */
+
+.rf-iitb {
+  --rf-pad: 12mm;
+  --rf-size: 9.6pt;
+  --rf-gap: 3mm;
+}
+
+.rf-iitb .rf-h2 {
+  background: #e9e9e9;
+  padding: 0.9mm 2mm;
+  border-left: 1.4pt solid #333;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.6mm;
+}
+
+/* --- Template: IIT Kharagpur --------------------------------------------- */
+
+.rf-iitkgp {
+  --rf-pad: 12mm;
+  --rf-size: 9.4pt;
+  --rf-gap: 2.8mm;
+}
+
+.rf-iitkgp .rf-h2 {
+  border-bottom: 0.8pt solid #222;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.6mm;
+}
+
+/* --- Template: NIT -------------------------------------------------------- */
+
+.rf-nit {
+  --rf-pad: 13mm;
+  --rf-size: 9.8pt;
+  --rf-accent: #10316b;
+}
+
+.rf-nit .rf-head {
+  border-bottom: 1.2pt solid var(--rf-accent);
+  padding-bottom: 2mm;
+  margin-bottom: 3mm;
+}
+
+.rf-nit .rf-h2 {
+  color: var(--rf-accent);
+}
+
+/* --- Template: Stanford --------------------------------------------------- */
+
+.rf-stanford {
+  --rf-pad: 15mm;
+  --rf-size: 10pt;
+  --rf-accent: #8c1515;
+  --rf-gap: 4.2mm;
+}
+
+.rf-stanford .rf-h1 {
+  font-size: 19pt;
+  font-weight: 600;
+}
+
+.rf-stanford .rf-h2 {
+  color: var(--rf-accent);
+  letter-spacing: 0.12em;
+}
+
+/* --- Template: Plain ATS -------------------------------------------------- */
+
+.rf-plain {
+  --rf-pad: 16mm;
+  --rf-size: 11pt;
+  --rf-lead: 1.4;
+  --rf-gap: 4.5mm;
+}
+
+.rf-plain .rf-h2 {
+  font-size: 11pt;
+  letter-spacing: 0.05em;
+}
+
+/* --- Template: Executive -------------------------------------------------- */
+
+.rf-exec {
+  --rf-pad: 15mm;
+  --rf-size: 10pt;
+  --rf-accent: #1f2937;
+  --rf-gap: 4mm;
+}
+
+.rf-exec .rf-head {
+  background: #1f2937;
+  color: #fff;
+  margin: calc(var(--rf-pad) * -1) calc(var(--rf-pad) * -1) 4.5mm;
+  padding: 9mm var(--rf-pad) 6mm;
+  /* Backgrounds are dropped by default when printing; force them. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rf-exec .rf-head .rf-contact,
+.rf-exec .rf-head .rf-muted {
+  color: #d1d5db;
+}
+
+.rf-exec .rf-head .rf-contact > span:not(:last-child)::after {
+  color: #6b7280;
+}
+
+.rf-exec .rf-h2 {
+  border-bottom: 1pt solid #d1d5db;
+  padding-bottom: 0.7mm;
+}
+
+/* --- Print ---------------------------------------------------------------- */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Hide the whole app, then re-show only the mounted print surface. */
+  body > *:not(#rf-print-root) {
+    display: none !important;
+  }
+
+  #rf-print-root {
+    display: block !important;
+    position: static !important;
+  }
+
+  #rf-print-root .rf-page {
+    width: auto;
+    min-height: auto;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .rf-section,
+  .rf-entry {
+    break-inside: avoid;
+  }
+
+  .rf-h2 {
+    break-after: avoid;
+  }
+}
