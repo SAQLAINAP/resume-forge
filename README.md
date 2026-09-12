@@ -2,6 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Android APK](https://github.com/SAQLAINAP/resume-forge/actions/workflows/android.yml/badge.svg)](https://github.com/SAQLAINAP/resume-forge/actions/workflows/android.yml)
+[![Latest release](https://img.shields.io/github/v/release/SAQLAINAP/resume-forge?style=flat-square)](https://github.com/SAQLAINAP/resume-forge/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 
 > Offline-first, ATS-safe résumé builder. Pick a format, answer only the questions that format needs, export as PDF, Word or PNG. No backend, no account, no network call anywhere.
@@ -68,7 +69,9 @@ npm run preview        # serve the production build locally
 
 ### Android APK
 
-**Grab a prebuilt debug APK.** Every push to `main` triggers [.github/workflows/android.yml](.github/workflows/android.yml), which builds an APK on a hosted runner and uploads it as an artifact named `resume-forge-debug-apk`. Download it from the workflow run's Summary page and sideload it (enable "Install unknown apps" for whichever app opens the file).
+**Latest release:** grab the signed-debug APK from the [v1.0.0 release page](https://github.com/SAQLAINAP/resume-forge/releases/latest). It installs on any device with sideloading enabled.
+
+**Bleeding edge:** every push to `main` triggers [.github/workflows/android.yml](.github/workflows/android.yml), which builds a fresh APK on a hosted runner and uploads it as an artifact named `resume-forge-debug-apk`. Download it from the workflow run's Summary page.
 
 **Or build it yourself.** Requires Node ≥ 22 and JDK 21 with the Android SDK.
 
