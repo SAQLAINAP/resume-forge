@@ -415,6 +415,304 @@
   padding-bottom: 0.7mm;
 }
 
+/* --- v2 additions: Compact band (FAANG family) ---------------------------- */
+
+.rf-band {
+  --rf-pad: 14mm;
+  --rf-size: 10pt;
+  --rf-gap: 3.4mm;
+}
+
+.rf-band .rf-head {
+  border-top: 4pt solid var(--rf-accent);
+  padding-top: 3mm;
+  margin-bottom: 4mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rf-band .rf-h1 {
+  font-size: 18pt;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.rf-band-headline {
+  font-size: 10.5pt;
+  color: var(--rf-accent);
+  font-weight: 600;
+  margin-top: 0.6mm;
+}
+
+.rf-band-contact {
+  margin-top: 1.6mm;
+}
+
+.rf-band-contact .rf-contact {
+  justify-content: flex-start;
+}
+
+.rf-band .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.6pt solid #e5e7eb;
+  padding-bottom: 0.6mm;
+}
+
+.rf-band-google  { --rf-accent: #4285f4; }
+.rf-band-meta    { --rf-accent: #1877f2; }
+.rf-band-amazon  { --rf-accent: #ff9900; }
+.rf-band-msft    { --rf-accent: #0078d4; }
+.rf-band-nflx    { --rf-accent: #e50914; }
+
+.rf-band-nflx .rf-head {
+  border-top-width: 2pt;
+}
+
+.rf-band-amazon .rf-h1 {
+  font-family: 'Amazon Ember', Inter, sans-serif;
+}
+
+.rf-band-msft {
+  --rf-size: 9.8pt;
+}
+
+/* --- v2 additions: Conservative (consulting / finance) ------------------- */
+
+.rf-conservative {
+  --rf-pad: 15mm;
+  --rf-size: 10.4pt;
+  --rf-lead: 1.3;
+}
+
+.rf-conservative .rf-head {
+  text-align: center;
+  margin-bottom: 3.5mm;
+}
+
+.rf-conservative .rf-h1 {
+  font-size: 15pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rf-conservative .rf-h2 {
+  border-bottom: 0.6pt solid #000;
+  letter-spacing: 0.14em;
+  padding-bottom: 0.6mm;
+  font-weight: 700;
+}
+
+.rf-consult-mck { --rf-accent: #003a70; }
+.rf-consult-gs  { --rf-accent: #7399c6; }
+.rf-consult-wh  { --rf-accent: #a41a37; }
+
+.rf-consult-gs .rf-row-right {
+  font-weight: 700;
+  color: #000;
+}
+
+.rf-consult-wh .rf-h1 {
+  color: var(--rf-accent);
+}
+
+/* --- v2 additions: Sidebar family ---------------------------------------- */
+
+.rf-sidebar {
+  --rf-pad: 12mm;
+  --rf-size: 9.8pt;
+  --rf-gap: 3mm;
+}
+
+.rf-sidebar .rf-head {
+  text-align: left;
+  border-left: 3pt solid var(--rf-accent);
+  padding-left: 3mm;
+  margin-bottom: 4mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rf-sidebar .rf-h1 {
+  color: var(--rf-accent);
+  font-weight: 700;
+}
+
+.rf-sidebar .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.4pt solid #d1d5db;
+  padding-bottom: 0.5mm;
+}
+
+.rf-sidebar .rf-side-block {
+  margin-bottom: 3mm;
+}
+
+.rf-sidebar .rf-col-side {
+  flex-basis: 62mm;
+}
+
+.rf-sidebar-bcg     { --rf-accent: #0e7c66; }
+.rf-sidebar-bain    { --rf-accent: #cc0000; }
+.rf-sidebar-creative {
+  --rf-accent: #7c3aed;
+}
+
+.rf-sidebar-creative .rf-col-side {
+  background: #f5f3ff;
+  padding: 4mm;
+  border-radius: 2mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* --- v2 additions: Campus variants --------------------------------------- */
+
+.rf-campus {
+  --rf-pad: 12mm;
+  --rf-size: 9.6pt;
+  --rf-gap: 3mm;
+}
+
+.rf-campus .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.6pt solid var(--rf-accent);
+  padding-bottom: 0.5mm;
+  letter-spacing: 0.06em;
+}
+
+.rf-campus-bits { --rf-accent: #00539c; }
+.rf-campus-dtu  { --rf-accent: #231f20; }
+.rf-campus-iiit { --rf-accent: #5b2c6f; }
+
+.rf-campus-bits .rf-h2 {
+  background: #eaf2fb;
+  padding: 0.8mm 2mm;
+  border-left: 1.4pt solid var(--rf-accent);
+  border-bottom: none;
+}
+
+.rf-campus-dtu .rf-h2 {
+  text-transform: uppercase;
+}
+
+/* --- v2 additions: MBA family -------------------------------------------- */
+
+.rf-mba {
+  --rf-pad: 15mm;
+  --rf-size: 10pt;
+  --rf-lead: 1.32;
+}
+
+.rf-mba .rf-head {
+  text-align: center;
+  margin-bottom: 3.5mm;
+}
+
+.rf-mba .rf-h1 {
+  font-size: 16pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.rf-mba .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.6pt solid var(--rf-accent);
+  padding-bottom: 0.5mm;
+  letter-spacing: 0.1em;
+}
+
+.rf-mba-iim     { --rf-accent: #7b1e29; }
+.rf-mba-isb     { --rf-accent: #003057; }
+.rf-mba-insead  { --rf-accent: #1c2b4a; }
+
+/* --- v2 additions: European CV family ------------------------------------ */
+
+.rf-euro {
+  --rf-pad: 16mm;
+  --rf-size: 10.4pt;
+  --rf-lead: 1.34;
+  font-family: 'Source Serif 4', 'Georgia', serif;
+}
+
+.rf-euro .rf-head {
+  text-align: left;
+  margin-bottom: 3mm;
+}
+
+.rf-euro .rf-h1 {
+  font-size: 17pt;
+  font-weight: 700;
+}
+
+.rf-euro .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.4pt solid var(--rf-accent);
+  padding-bottom: 0.5mm;
+  letter-spacing: 0.08em;
+}
+
+.rf-euro-ox      { --rf-accent: #002147; }
+.rf-euro-cam     { --rf-accent: #4b7360; }
+.rf-euro-europass { --rf-accent: #003399; }
+
+.rf-euro-europass {
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+/* --- v2 additions: Format variants --------------------------------------- */
+
+.rf-chron {
+  --rf-pad: 16mm;
+  --rf-size: 11pt;
+  --rf-lead: 1.4;
+  --rf-gap: 4mm;
+}
+
+.rf-chron .rf-h2 {
+  border-bottom: 0.4pt solid #9ca3af;
+  padding-bottom: 0.5mm;
+}
+
+.rf-functional {
+  --rf-pad: 16mm;
+  --rf-size: 10.6pt;
+  --rf-lead: 1.36;
+  --rf-gap: 4.2mm;
+  --rf-accent: #334155;
+}
+
+.rf-functional .rf-h2 {
+  color: var(--rf-accent);
+  letter-spacing: 0.1em;
+}
+
+.rf-functional .rf-h2::before {
+  content: '// ';
+  color: #cbd5e1;
+}
+
+.rf-federal {
+  --rf-pad: 18mm;
+  --rf-size: 11pt;
+  --rf-lead: 1.42;
+  --rf-gap: 4.5mm;
+  --rf-accent: #1a3a63;
+  font-family: 'Source Serif 4', 'Georgia', 'Times New Roman', serif;
+}
+
+.rf-federal .rf-h2 {
+  color: var(--rf-accent);
+  border-bottom: 0.5pt solid var(--rf-accent);
+  padding-bottom: 0.5mm;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.rf-federal .rf-bullets {
+  padding-left: 5.5mm;
+}
+
 /* --- Print ---------------------------------------------------------------- */
 
 @page {

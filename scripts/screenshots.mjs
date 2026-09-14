@@ -130,9 +130,11 @@ async function shot(browser, path, file, height = 900) {
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--hide-scrollbars'] })
 
-await shot(browser, '/', 'gallery.png', 900)
+await shot(browser, '/', 'gallery.png', 1200)
 await shot(browser, '/edit/jake', 'editor-jake.png', 1000)
 await shot(browser, '/edit/harvard', 'editor-harvard.png', 1000)
+await shot(browser, '/edit/google', 'editor-google.png', 1000)
+await shot(browser, '/edit/bcg', 'editor-bcg.png', 1000)
 await shot(browser, '/build/nit', 'wizard.png', 720)
 await shot(browser, '/profiles', 'profiles.png', 600)
 

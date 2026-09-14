@@ -1,43 +1,31 @@
 # Roadmap
 
-v1 is shipped: 11 formats, profiles, the gap-diffing wizard, and three ATS-safe
-export paths, all offline. What follows is ordered by how much each thing
+v2 is shipped: 32 formats, undo/redo, offline JD keyword matcher, bullet-quality
+coach, one-page fit meter. What follows is ordered by how much each thing
 improves the résumé the user actually walks away with — not by how interesting
 it is to build.
 
 ---
 
-## v2 — make the résumé *good*, not just correct
+## Shipped in v2 (2026-09)
 
-v1 guarantees a machine can read your résumé. It does nothing to make a human
-want to. That's the gap.
-
-**1. Tailoring to a job description.** Paste a JD; the app extracts its terms and
-shows which ones your résumé already covers and which it misses, per section.
-This is the highest-leverage feature in the entire product — keyword overlap is
-literally how most ATS ranking works — and it can be done fully offline with a
-tokeniser and a stopword list. No model required.
-
-**2. Bullet quality feedback.** Flag the patterns that make bullets weak: no
-leading action verb, no number anywhere, "responsible for", passive voice, over
-two lines long. Offline, rule-based, immediate. Pair each flag with a rewritten
-example so it teaches rather than scolds.
-
-**3. One-page fit assistant.** The app already knows the rendered page height. It
-can therefore say "you are 3 lines over" and offer concrete levers — tighten
-leading, drop the oldest role, shorten these two bullets — instead of leaving
-the user to fiddle blindly.
-
-**4. Section-level variants.** Keep three versions of your summary and two
-experience orderings inside one profile, then pick per résumé. This is what
-people actually do when they apply to both backend and ML roles, and today it
-forces a duplicated profile.
-
-**5. Undo/redo and autosave history.** Non-negotiable once people are editing
-seriously. Snapshot on each committed change; keep the last N in IndexedDB.
-
-**6. Fix the PDF filename.** Via the Capacitor shell on mobile, and by
-documenting the desktop print-dialog path clearly in-app.
+- 21 new templates: Google, Meta, Amazon, Microsoft, Netflix, McKinsey, BCG,
+  Bain, Goldman, Wharton, BITS, DTU, IIIT, IIM Ahmedabad, ISB, Oxford, Cambridge,
+  INSEAD, Europass, plus Reverse-Chronological / Functional / Federal / Creative
+  format variants. Total: 32.
+- **Undo / redo** with ⌘Z / ⇧⌘Z, snapshot ring of 50 entries, coalesced within
+  350 ms so a burst of typing collapses into one step.
+- **Bullet coach** — rule-based scoring against verb strength, metric presence,
+  hedging, length and first-person; per-role grouping and an average score.
+- **Offline JD keyword matcher** — paste a posting; we tokenise, strip stopwords,
+  intersect against the resume's bag of tokens, and highlight what is missing vs
+  covered. The JD text is kept in `localStorage` so it clears across sessions.
+- **Page fit meter** — reads the rendered preview via `ResizeObserver`, converts
+  CSS pixels to millimetres, and reports pages and fill percentage plus concrete
+  trim advice.
+- **Editor refactor** — accordion and section editor extracted out of the render
+  body so parent re-renders no longer remount inputs mid-typing. Export errors
+  now surface via an inline banner rather than a silent finally-block.
 
 ---
 
@@ -61,7 +49,14 @@ what happened. The app already has the résumé; adding the outcome is what turn
 it from a document tool into something worth reopening every week — and it makes
 the tailoring data in v2 measurable.
 
-**5. Optional, opt-in local LLM.** WebGPU, model downloaded on demand, entirely
+**5. Section-level variants.** Keep three versions of your summary and two
+experience orderings inside one profile, then pick per résumé. Deferred from v2:
+worth doing once the JD matcher has proven which fields people actually swap.
+
+**6. Signed release APK.** Play-Store-signed build behind a keystore GitHub
+secret, replacing the debug-signed sideload artefact.
+
+**7. Optional, opt-in local LLM.** WebGPU, model downloaded on demand, entirely
 on-device. Rewrite a bullet, draft a summary from a role description. This is
 deliberately *last*: it is the flashiest item and the least load-bearing, and
 shipping it earlier would compromise the "lightweight and offline" promise that
@@ -77,3 +72,6 @@ everything else depends on.
 - **Telemetry.** A résumé is among the most sensitive documents a person owns.
 - **A visual drag-and-drop template designer.** It produces layouts that look
   designed and parse badly. The curated registry is the point.
+- **AI-assisted "generate my resume from a LinkedIn URL".** Would require a
+  scraper (illegal), a server-side LLM (violates the offline promise) or both.
+  Import from an exported JSON Resume is a bounded, honest substitute.

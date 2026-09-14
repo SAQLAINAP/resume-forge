@@ -1,4 +1,6 @@
-# Decision log — v1
+# Decision log
+
+Split across v1 (§1–§10) and v2 (§11–§14).
 
 Every entry is a fork in the road: what was chosen, what was rejected, and what
 it costs. If any of these turns out to be wrong, this file says exactly what to
@@ -187,11 +189,113 @@ fetched otherwise.
 
 ---
 
-## Known gaps in v1
+---
 
-- No undo/redo in the editor.
-- No spell-check or content quality feedback on bullets.
-- PDF filename is chosen in the browser's print dialog, not by us (§1).
-- Two-column layouts flatten to one column in Word (§2), by design.
-- No automated tests; v1 was verified manually in-browser, including unzipping
-  the generated `.docx` to confirm extractable text.
+## 11. Undo/redo as snapshot ring, not diff/CRDT
+
+**Chosen:** every mutation captures the previous `{ profiles, activeProfileId,
+lastTemplateId }` slice into a bounded (50-entry) past stack; undo pops back
+onto a future stack, redo reverses. Entries within 350 ms of the last push
+coalesce into the same undo step.
+
+**Rejected:** patch-based history (`immer` inverse patches or JSON-Patch) and a
+CRDT log.
+
+**Why:** the persisted state is a few hundred KB at worst. 50 shallow snapshots
+is well under one MB. Patches would save bytes at the cost of being fragile
+against schema changes — a v3 field addition breaks history replay in
+mysterious ways. Snapshots survive schema drift for free because they are just
+older shapes of the same object graph.
+
+**Cost:** the ring lives in memory, not IndexedDB. Refreshing the page loses
+history — deliberate, because undoing back across a page reload would surprise
+more than it helps.
+
+**Coalescing threshold:** 350 ms is long enough to fold a burst of keystrokes
+into one step and short enough that clicking Add / Remove is always its own
+step. Anything smaller made ⌘Z near-useless; anything larger meant intentional
+edits were bundled together.
+
+---
+
+## 12. Bullet-quality feedback is rule-based, not LLM
+
+**Chosen:** a static vocabulary of strong action verbs and hedges, plus regex
+checks for numeric density, first-person, and length. Runs on every keystroke
+in microseconds.
+
+**Rejected:** shipping an on-device WebGPU LLM (Phi, Qwen-3B) for bullet
+rewriting.
+
+**Why:** the LLM download is ~1.5 GB minimum for anything usable — twenty times
+the current app payload. That violates the "lightweight, offline, installable
+on a phone" promise more than the LLM could ever improve any individual bullet.
+And rules cover 80% of the actual advice ("start with a verb", "add a metric",
+"drop 'responsible for'") without weighing anything.
+
+**Cost:** the coach can flag but not rewrite. That is a feature: the app never
+puts words in the user's mouth, so a bullet the app approves of is one the user
+still wrote.
+
+**Reverse it if:** WebGPU model download becomes a first-class OS capability
+(cached across sites, resumed across sessions). Then the model is a one-time
+cost the user opts into, not a per-app tax.
+
+---
+
+## 13. JD keyword matcher runs in-page, not through an API
+
+**Chosen:** tokenise the pasted JD, strip stopwords, hash-set-intersect against
+tokens drawn from the resume. Store the JD scratch in `localStorage`.
+
+**Rejected:** using a hosted keyword-extraction endpoint (e.g. an NLP API),
+which would be a two-line change.
+
+**Why:** JDs are frequently confidential — internal referrals, unposted roles,
+NDAs. The offline promise is the whole product; sending JDs to a server would
+break it in the single most sensitive place. And crude bag-of-words intersection
+matches what most modern ATSes actually do, so extra sophistication would look
+smarter without ranking any better.
+
+**Cost:** synonyms and morphology are naïve. "PostgreSQL" and "Postgres" are
+different tokens; "led" and "leadership" don't collapse. Mitigated by keeping
+the coverage percentage advisory rather than authoritative, and showing the
+missing tokens verbatim so the user judges.
+
+**`localStorage` rather than IndexedDB for the scratch:** the JD should be
+transient. Private windows clear it. It never gets bundled into a profile
+export by accident.
+
+---
+
+## 14. Page fit is measured from the live preview, not a shadow render
+
+**Chosen:** attach a `ResizeObserver` to the visible preview node, read its
+scaled height, back out the CSS `transform: scale()` to recover the
+pre-scale pixel height, convert 96 CSS px → 25.4 mm.
+
+**Rejected:** rendering the resume into a hidden offscreen div at 1:1 scale for
+measurement.
+
+**Why:** the preview already renders at the true page size and is already being
+observed for the scale calculation. A second offscreen render doubles the DOM
+work on every keystroke for the same number. The scale factor is easy to read
+from `getComputedStyle`.
+
+**Cost:** subtly wrong if browser DPI differs from the assumed 96 (Chrome and
+Firefox sometimes disagree by ~2 mm). The meter is advisory — it fingers "one
+page vs. two", "comfortable vs. cramped" — not authoritative to the millimetre.
+Called out in the tooltip.
+
+---
+
+## Known gaps in v2
+
+- PDF filename is still chosen in the browser's print dialog, not by us (§1).
+- Two-column layouts still flatten to one column in Word (§2), by design.
+- Undo history is not persisted across page reloads (§11).
+- Bullet coach flags but does not rewrite (§12).
+- Signed release APK is still not set up — sideloaded debug APK only.
+- No automated test suite. Manual verification: rendering all 32 templates
+  against sample data, generating .docx and unzipping it to confirm text, and
+  clicking through undo/redo across every editor action.

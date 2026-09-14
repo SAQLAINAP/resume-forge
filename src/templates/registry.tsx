@@ -2,17 +2,40 @@ import type { ComponentType } from 'react'
 import type { SectionKey, TemplateMeta } from '../core/types'
 import type { TemplateProps } from './primitives'
 import {
+  AmazonTemplate,
+  BainTemplate,
+  BcgTemplate,
+  BitsTemplate,
+  CambridgeTemplate,
+  ChronologicalTemplate,
+  CreativeTemplate,
   DeedyTemplate,
+  DtuTemplate,
+  EuropassTemplate,
   ExecTemplate,
+  FederalTemplate,
+  FunctionalTemplate,
+  GoldmanTemplate,
+  GoogleTemplate,
   HarvardTemplate,
+  IimTemplate,
+  IiitTemplate,
   IitbTemplate,
   IitkgpTemplate,
+  InseadTemplate,
+  IsbTemplate,
   JakeTemplate,
+  McKinseyTemplate,
+  MetaTemplate,
+  MicrosoftTemplate,
   MitTemplate,
+  NetflixTemplate,
   NitTemplate,
+  OxfordTemplate,
   PlainTemplate,
   ResearchTemplate,
   StanfordTemplate,
+  WhartonTemplate,
 } from './layouts'
 
 export interface TemplateEntry extends TemplateMeta {
@@ -29,7 +52,48 @@ const CAMPUS_SECTIONS: SectionKey[] = [
   'extracurriculars',
 ]
 
+const CAMPUS_WITH_CERTS: SectionKey[] = [...CAMPUS_SECTIONS, 'certifications']
+
+const BIGTECH_SECTIONS: SectionKey[] = [
+  'experience',
+  'projects',
+  'skills',
+  'education',
+  'achievements',
+  'certifications',
+]
+
+const MBA_SECTIONS: SectionKey[] = [
+  'education',
+  'experience',
+  'positions',
+  'achievements',
+  'skills',
+  'languages',
+  'certifications',
+]
+
+const EURO_SECTIONS: SectionKey[] = [
+  'education',
+  'experience',
+  'projects',
+  'publications',
+  'skills',
+  'languages',
+  'achievements',
+]
+
+const CONSERVATIVE_SECTIONS: SectionKey[] = [
+  'education',
+  'experience',
+  'projects',
+  'skills',
+  'achievements',
+  'languages',
+]
+
 export const TEMPLATES: TemplateEntry[] = [
+  /* -- v1 (kept) ---------------------------------------------------------- */
   {
     id: 'jake',
     name: "Jake's Resume",
@@ -135,7 +199,7 @@ export const TEMPLATES: TemplateEntry[] = [
     blurb:
       'Split header with contact block on the right, navy accents, and room for certifications alongside training.',
     flairs: ['core-eng', 'swe', 'student', 'intern', 'one-page', 'dense', 'india'],
-    sections: [...CAMPUS_SECTIONS, 'certifications'],
+    sections: CAMPUS_WITH_CERTS,
     requiredSections: ['education'],
     columns: 1,
     atsScore: 'good',
@@ -200,6 +264,346 @@ export const TEMPLATES: TemplateEntry[] = [
     atsScore: 'good',
     accent: '#374151',
     Component: ResearchTemplate,
+  },
+
+  /* -- v2 additions: FAANG / Big Tech ------------------------------------ */
+  {
+    id: 'google',
+    name: 'Google New Grad',
+    origin: 'Google University Recruiting guides',
+    blurb:
+      'Colour-blocked header with tight typography. What Google engineers submit for internal transfers and referrals.',
+    flairs: ['swe', 'data', 'intern', 'student', 'mid', 'one-page', 'photo-free', 'us'],
+    sections: BIGTECH_SECTIONS,
+    requiredSections: ['experience', 'skills'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#4285f4',
+    Component: GoogleTemplate,
+  },
+  {
+    id: 'meta',
+    name: 'Meta Engineering',
+    origin: 'Meta university brand guide',
+    blurb:
+      'Facebook-blue accent bar over a single-column body. Rewards impact bullets that lead with metrics.',
+    flairs: ['swe', 'data', 'mid', 'senior', 'one-page', 'dense', 'us'],
+    sections: BIGTECH_SECTIONS,
+    requiredSections: ['experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#1877f2',
+    Component: MetaTemplate,
+  },
+  {
+    id: 'amazon',
+    name: 'Amazon LP-Aligned',
+    origin: 'Amazon Career hub template',
+    blurb:
+      'STAR-friendly single column. The header stays plain so leadership-principles bullets do the talking.',
+    flairs: ['swe', 'product', 'non-tech', 'mid', 'senior', 'one-page', 'photo-free', 'us'],
+    sections: BIGTECH_SECTIONS,
+    requiredSections: ['experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#ff9900',
+    Component: AmazonTemplate,
+  },
+  {
+    id: 'microsoft',
+    name: 'Microsoft Segoe',
+    origin: 'Microsoft Careers style',
+    blurb:
+      'Understated blue bar, Segoe-ish sans, dense one page. What Microsoft recruiters see all day and read cleanly.',
+    flairs: ['swe', 'core-eng', 'mid', 'one-page', 'dense', 'us'],
+    sections: BIGTECH_SECTIONS,
+    requiredSections: ['experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#0078d4',
+    Component: MicrosoftTemplate,
+  },
+  {
+    id: 'netflix',
+    name: 'Netflix Minimal',
+    origin: 'Netflix Culture memo aesthetic',
+    blurb:
+      'Deep red rule, ultra-minimal typography. Skips the summary — Netflix engineers rarely write one.',
+    flairs: ['swe', 'senior', 'one-page', 'airy', 'us'],
+    sections: BIGTECH_SECTIONS,
+    requiredSections: ['experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#e50914',
+    Component: NetflixTemplate,
+  },
+
+  /* -- v2 additions: Consulting / Finance -------------------------------- */
+  {
+    id: 'mckinsey',
+    name: 'McKinsey PST',
+    origin: 'McKinsey campus template',
+    blurb:
+      'Small-caps section heads, no colour, achievements ahead of skills. The format PST-track candidates submit.',
+    flairs: ['consulting', 'non-tech', 'senior', 'mid', 'airy', 'photo-free', 'us', 'europe'],
+    sections: CONSERVATIVE_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#003a70',
+    Component: McKinseyTemplate,
+  },
+  {
+    id: 'bcg',
+    name: 'BCG Two-Column',
+    origin: 'Boston Consulting Group EMEA guide',
+    blurb:
+      'Left sidebar for education and languages, main column for strategy engagements. Green accents throughout.',
+    flairs: ['consulting', 'non-tech', 'mid', 'senior', 'two-column', 'europe', 'us'],
+    sections: [...CONSERVATIVE_SECTIONS, 'languages', 'certifications'],
+    requiredSections: ['education', 'experience'],
+    columns: 2,
+    atsScore: 'good',
+    accent: '#0e7c66',
+    Component: BcgTemplate,
+  },
+  {
+    id: 'bain',
+    name: 'Bain Sidebar',
+    origin: 'Bain & Company case-team template',
+    blurb:
+      'Red-accented sidebar layout tuned for consulting cases and MBB interview loops.',
+    flairs: ['consulting', 'mid', 'senior', 'two-column', 'europe', 'us'],
+    sections: [...CONSERVATIVE_SECTIONS, 'languages', 'certifications'],
+    requiredSections: ['education', 'experience'],
+    columns: 2,
+    atsScore: 'good',
+    accent: '#cc0000',
+    Component: BainTemplate,
+  },
+  {
+    id: 'goldman',
+    name: 'Goldman IBD',
+    origin: 'Goldman Sachs Investment Banking format',
+    blurb:
+      'Dense, tightly-ruled single column, right-aligned dates in bold. Every millimetre packed with signal.',
+    flairs: ['consulting', 'non-tech', 'mid', 'senior', 'one-page', 'dense', 'us'],
+    sections: CONSERVATIVE_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#7399c6',
+    Component: GoldmanTemplate,
+  },
+  {
+    id: 'wharton',
+    name: 'Wharton MBA',
+    origin: 'Wharton MBA Career Management',
+    blurb:
+      'Education front and centre, quantified achievements block, extra room for leadership. Two pages when needed.',
+    flairs: ['consulting', 'non-tech', 'product', 'mid', 'senior', 'airy', 'us'],
+    sections: [...MBA_SECTIONS, 'projects'],
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#a41a37',
+    Component: WhartonTemplate,
+  },
+
+  /* -- v2 additions: Indian campus + MBA --------------------------------- */
+  {
+    id: 'bits',
+    name: 'BITS Pilani Standard',
+    origin: 'BITS Pilani Placement Unit',
+    blurb:
+      'The compact single-page BITSian format with a marks table and Practice School experience up top.',
+    flairs: ['swe', 'core-eng', 'student', 'intern', 'one-page', 'dense', 'india'],
+    sections: CAMPUS_WITH_CERTS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#00539c',
+    Component: BitsTemplate,
+  },
+  {
+    id: 'dtu',
+    name: 'DTU Delhi',
+    origin: 'Delhi Technological University T&P Cell',
+    blurb:
+      'Standard DTU campus format with certifications section. Works for both circuit and non-circuit branches.',
+    flairs: ['core-eng', 'swe', 'student', 'intern', 'one-page', 'dense', 'india'],
+    sections: CAMPUS_WITH_CERTS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#231f20',
+    Component: DtuTemplate,
+  },
+  {
+    id: 'iiit',
+    name: 'IIIT Campus',
+    origin: 'IIIT-H / IIIT-B placement office',
+    blurb:
+      'What IIIT students hand in for tech placements — CS-heavy with room for research and open-source projects.',
+    flairs: ['swe', 'data', 'research', 'student', 'intern', 'one-page', 'dense', 'india'],
+    sections: CAMPUS_WITH_CERTS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#5b2c6f',
+    Component: IiitTemplate,
+  },
+  {
+    id: 'iim',
+    name: 'IIM Ahmedabad',
+    origin: 'IIM Ahmedabad Placement Committee',
+    blurb:
+      'MBA-standard format leading with education and academic achievements. Leadership section pulled out separately.',
+    flairs: ['consulting', 'product', 'non-tech', 'mid', 'senior', 'one-page', 'india'],
+    sections: MBA_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#7b1e29',
+    Component: IimTemplate,
+  },
+  {
+    id: 'isb',
+    name: 'ISB Hyderabad',
+    origin: 'Indian School of Business CAS',
+    blurb:
+      'Post-experience MBA layout — professional experience first, then ISB PGP, then leadership highlights.',
+    flairs: ['consulting', 'product', 'non-tech', 'senior', 'one-page', 'india'],
+    sections: MBA_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#003057',
+    Component: IsbTemplate,
+  },
+
+  /* -- v2 additions: European / International ---------------------------- */
+  {
+    id: 'oxford',
+    name: 'Oxford Academic',
+    origin: 'University of Oxford Careers Service',
+    blurb:
+      'British academic CV: personal statement, then education, then research and publications. Grows to two pages naturally.',
+    flairs: ['research', 'consulting', 'senior', 'airy', 'photo-free', 'europe'],
+    sections: EURO_SECTIONS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#002147',
+    Component: OxfordTemplate,
+  },
+  {
+    id: 'cambridge',
+    name: 'Cambridge CV',
+    origin: 'University of Cambridge Careers Service',
+    blurb:
+      'Cambridge Careers Service reference format. Same discipline as Oxford, slightly denser typographic setup.',
+    flairs: ['research', 'consulting', 'senior', 'airy', 'photo-free', 'europe'],
+    sections: EURO_SECTIONS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#a3c1ad',
+    Component: CambridgeTemplate,
+  },
+  {
+    id: 'insead',
+    name: 'INSEAD MBA',
+    origin: 'INSEAD Career Development Centre',
+    blurb:
+      'Bilingual-friendly European MBA layout. Languages block is first-class; role bullets are quantified.',
+    flairs: ['consulting', 'product', 'non-tech', 'senior', 'airy', 'europe'],
+    sections: MBA_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#1c2b4a',
+    Component: InseadTemplate,
+  },
+  {
+    id: 'europass',
+    name: 'Europass CV',
+    origin: 'European Commission Europass',
+    blurb:
+      'Simplified Europass-style layout. Skips the sidebar and photo box that break parsers, keeps the section ordering.',
+    flairs: ['non-tech', 'research', 'mid', 'senior', 'airy', 'photo-free', 'europe'],
+    sections: EURO_SECTIONS,
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#003399',
+    Component: EuropassTemplate,
+  },
+
+  /* -- v2 additions: Format variants ------------------------------------- */
+  {
+    id: 'chronological',
+    name: 'Reverse Chronological',
+    origin: 'Resume Forge',
+    blurb:
+      'The classic North-American format: summary, career history newest first, then education. Nothing fancy.',
+    flairs: ['non-tech', 'marketing', 'swe', 'mid', 'senior', 'one-page', 'photo-free', 'us'],
+    sections: ['experience', 'education', 'skills', 'certifications'],
+    requiredSections: ['experience'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#1f2937',
+    Component: ChronologicalTemplate,
+  },
+  {
+    id: 'functional',
+    name: 'Functional / Skills-First',
+    origin: 'Resume Forge',
+    blurb:
+      'Skills and selected work up top, employment history relegated below. For career switchers and portfolio-led roles.',
+    flairs: ['design', 'marketing', 'non-tech', 'mid', 'one-page', 'airy', 'us'],
+    sections: ['skills', 'projects', 'experience', 'education', 'certifications'],
+    requiredSections: ['skills'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#334155',
+    Component: FunctionalTemplate,
+  },
+  {
+    id: 'federal',
+    name: 'US Federal Long-Form',
+    origin: 'USAJOBS resume builder',
+    blurb:
+      'The verbose format US federal postings expect. Detailed responsibilities, all coursework, no length cap.',
+    flairs: ['non-tech', 'research', 'senior', 'airy', 'photo-free', 'us'],
+    sections: [
+      'experience',
+      'education',
+      'skills',
+      'certifications',
+      'achievements',
+      'positions',
+      'publications',
+    ],
+    requiredSections: ['experience', 'education'],
+    columns: 1,
+    atsScore: 'excellent',
+    accent: '#1a3a63',
+    Component: FederalTemplate,
+  },
+  {
+    id: 'creative',
+    name: 'Creative Sidebar',
+    origin: 'Resume Forge',
+    blurb:
+      'Sidebar with contact and skills, main column for portfolio work. For design, marketing and product roles.',
+    flairs: ['design', 'product', 'marketing', 'mid', 'two-column', 'airy', 'us', 'europe'],
+    sections: ['experience', 'projects', 'skills', 'education', 'achievements', 'languages'],
+    requiredSections: ['experience'],
+    columns: 2,
+    atsScore: 'fair',
+    accent: '#7c3aed',
+    Component: CreativeTemplate,
   },
 ]
 
