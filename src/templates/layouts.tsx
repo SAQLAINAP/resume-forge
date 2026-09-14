@@ -8,13 +8,17 @@ import {
   EducationTableBlock,
   ExperienceBlock,
   ExtracurricularsBlock,
+  GrantsBlock,
   LanguagesBlock,
   PositionsBlock,
   ProjectsBlock,
   PublicationsBlock,
+  ServiceBlock,
   SkillsBlock,
   SkillsStackedBlock,
   SummaryBlock,
+  TalksBlock,
+  TeachingBlock,
 } from './blocks'
 
 /**
@@ -604,6 +608,92 @@ export function FederalTemplate({ data }: TemplateProps) {
       <CertificationsBlock data={data} />
       <AchievementsBlock data={data} title="Awards & Recognition" />
       <PositionsBlock data={data} title="Additional Service" />
+    </div>
+  )
+}
+
+/* -- CV templates (v3 beta) ------------------------------------------------ */
+/**
+ * The CV family runs long by design — we skip the "one page" fit-checker and
+ * push publications, grants, teaching and service in the ordering academics
+ * expect. Same block library as résumés; different order, different CSS.
+ */
+
+export function CvAcademicLongTemplate({ data }: TemplateProps) {
+  return (
+    <div className="rf-page rf-cv rf-cv-academic rf-serif">
+      <header className="rf-cv-head">
+        <Name data={data} />
+        {data.basics.headline && <div className="rf-muted rf-small">{data.basics.headline}</div>}
+        <div style={{ marginTop: '1.4mm' }}>
+          <ContactLine data={data} />
+        </div>
+      </header>
+      <SummaryBlock data={data} title="Research Statement" />
+      <EducationBlock data={data} />
+      <ExperienceBlock data={data} title="Academic Appointments" />
+      <PublicationsBlock data={data} />
+      <GrantsBlock data={data} />
+      <TeachingBlock data={data} />
+      <TalksBlock data={data} />
+      <ServiceBlock data={data} />
+      <AchievementsBlock data={data} title="Awards & Honours" />
+      <SkillsBlock data={data} title="Technical Skills" />
+      <LanguagesBlock data={data} />
+    </div>
+  )
+}
+
+export function CvResearchModernTemplate({ data }: TemplateProps) {
+  return (
+    <div className="rf-page rf-cv rf-cv-modern rf-sans">
+      <header className="rf-cv-modern-head">
+        <div>
+          <Name data={data} />
+          {data.basics.headline && <div className="rf-muted rf-small">{data.basics.headline}</div>}
+        </div>
+        <div className="rf-cv-modern-contact">
+          <ContactLine data={data} />
+        </div>
+      </header>
+      <SummaryBlock data={data} title="About" />
+      <ExperienceBlock data={data} title="Positions" />
+      <EducationBlock data={data} />
+      <PublicationsBlock data={data} />
+      <GrantsBlock data={data} />
+      <TalksBlock data={data} />
+      <TeachingBlock data={data} />
+      <ServiceBlock data={data} />
+      <SkillsBlock data={data} title="Skills" />
+      <AchievementsBlock data={data} title="Awards" />
+    </div>
+  )
+}
+
+export function CvEuropeanExtendedTemplate({ data }: TemplateProps) {
+  return (
+    <div className="rf-page rf-cv rf-cv-european rf-sans">
+      <header className="rf-cv-euro-head">
+        <Name data={data} />
+        {data.basics.headline && <div className="rf-muted">{data.basics.headline}</div>}
+        <div style={{ marginTop: '1.6mm' }}>
+          <ContactLine data={data} />
+        </div>
+      </header>
+      <SummaryBlock data={data} title="Personal Statement" />
+      <EducationBlock data={data} />
+      <ExperienceBlock data={data} title="Professional Experience" />
+      <PublicationsBlock data={data} />
+      <GrantsBlock data={data} />
+      <TeachingBlock data={data} />
+      <TalksBlock data={data} />
+      <ServiceBlock data={data} />
+      <ProjectsBlock data={data} />
+      <SkillsBlock data={data} />
+      <LanguagesBlock data={data} />
+      <AchievementsBlock data={data} title="Awards & Honours" />
+      <CertificationsBlock data={data} />
+      <ExtracurricularsBlock data={data} />
     </div>
   )
 }

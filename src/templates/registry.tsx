@@ -9,6 +9,9 @@ import {
   CambridgeTemplate,
   ChronologicalTemplate,
   CreativeTemplate,
+  CvAcademicLongTemplate,
+  CvEuropeanExtendedTemplate,
+  CvResearchModernTemplate,
   DeedyTemplate,
   DtuTemplate,
   EuropassTemplate,
@@ -71,6 +74,19 @@ const MBA_SECTIONS: SectionKey[] = [
   'skills',
   'languages',
   'certifications',
+]
+
+const CV_SECTIONS: SectionKey[] = [
+  'education',
+  'experience',
+  'publications',
+  'grants',
+  'teaching',
+  'talks',
+  'service',
+  'achievements',
+  'skills',
+  'languages',
 ]
 
 const EURO_SECTIONS: SectionKey[] = [
@@ -604,6 +620,56 @@ export const TEMPLATES: TemplateEntry[] = [
     atsScore: 'fair',
     accent: '#7c3aed',
     Component: CreativeTemplate,
+  },
+
+  /* -- v3 additions: CV templates (beta) --------------------------------- */
+  {
+    id: 'cv-academic-long',
+    name: 'Academic CV — Long-form',
+    origin: 'Resume Forge · academic reference',
+    blurb:
+      'The long US academic CV: research statement, appointments, publications, grants, teaching, service. Multi-page by design.',
+    flairs: ['research', 'senior', 'airy', 'photo-free', 'us', 'europe'],
+    sections: CV_SECTIONS,
+    requiredSections: ['education', 'publications'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#0f172a',
+    kind: 'cv',
+    beta: true,
+    Component: CvAcademicLongTemplate,
+  },
+  {
+    id: 'cv-research-modern',
+    name: 'Research CV — Modern',
+    origin: 'Resume Forge · modern research layout',
+    blurb:
+      'Cleaner sans-serif take on the research CV — for postdocs, industrial research and applied ML roles.',
+    flairs: ['research', 'data', 'mid', 'senior', 'airy', 'photo-free', 'us', 'europe'],
+    sections: CV_SECTIONS,
+    requiredSections: ['education'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#1e40af',
+    kind: 'cv',
+    beta: true,
+    Component: CvResearchModernTemplate,
+  },
+  {
+    id: 'cv-european-extended',
+    name: 'European CV — Extended',
+    origin: 'Resume Forge · European academic conventions',
+    blurb:
+      'Long-form European academic CV. Includes personal statement, grants, teaching and community service — as EU reviewers expect.',
+    flairs: ['research', 'non-tech', 'senior', 'airy', 'photo-free', 'europe'],
+    sections: [...CV_SECTIONS, 'projects', 'certifications', 'extracurriculars'],
+    requiredSections: ['education', 'experience'],
+    columns: 1,
+    atsScore: 'good',
+    accent: '#003399',
+    kind: 'cv',
+    beta: true,
+    Component: CvEuropeanExtendedTemplate,
   },
 ]
 

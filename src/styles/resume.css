@@ -754,3 +754,200 @@
     break-after: avoid;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Cover letters (v3)
+   Letters use US Letter (216 × 279 mm) — the North-American default and what
+   most ATS letter parsers expect. The three layouts are screen/PDF-only
+   variants; the DOCX exporter collapses to one canonical block letter.
+   --------------------------------------------------------------------------- */
+
+.rf-letter {
+  --rf-pad: 22mm;
+  padding: var(--rf-pad);
+  font-size: 11pt;
+  line-height: 1.5;
+}
+
+.rf-letter .rf-letter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8mm;
+  margin-bottom: 10mm;
+}
+
+.rf-letter .rf-letter-sender .rf-letter-name {
+  font-weight: 700;
+  font-size: 14pt;
+}
+
+.rf-letter .rf-letter-date {
+  font-size: 10.5pt;
+  color: var(--rf-muted);
+  white-space: nowrap;
+}
+
+.rf-letter .rf-letter-recipient {
+  margin-bottom: 6mm;
+}
+
+.rf-letter .rf-letter-subject {
+  font-weight: 600;
+  margin-bottom: 4mm;
+}
+
+.rf-letter .rf-letter-greeting {
+  margin-bottom: 4mm;
+}
+
+.rf-letter .rf-letter-body p {
+  margin: 0 0 4mm 0;
+  text-align: justify;
+}
+
+.rf-letter .rf-letter-closing {
+  margin-top: 6mm;
+}
+
+.rf-letter .rf-letter-signature {
+  margin-top: 8mm;
+  font-weight: 600;
+}
+
+/* Modern-header variant */
+
+.rf-letter-modern .rf-letter-modern-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8mm;
+  padding-bottom: 3mm;
+}
+
+.rf-letter-modern .rf-letter-name-lg {
+  font-weight: 700;
+  font-size: 20pt;
+  letter-spacing: -0.01em;
+}
+
+.rf-letter-modern .rf-letter-modern-contact {
+  text-align: right;
+  line-height: 1.4;
+}
+
+.rf-letter-modern .rf-rule {
+  margin: 2mm 0 8mm 0;
+}
+
+.rf-letter-modern .rf-letter-modern-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8mm;
+  margin-bottom: 8mm;
+}
+
+/* Split-column variant */
+
+.rf-letter-split {
+  display: grid;
+  grid-template-columns: 62mm 1fr;
+  gap: 10mm;
+  --rf-pad: 18mm;
+}
+
+.rf-letter-split .rf-letter-split-side {
+  border-right: 0.4mm solid #ddd;
+  padding-right: 8mm;
+  font-size: 10pt;
+  line-height: 1.45;
+}
+
+.rf-letter-split .rf-letter-split-side .rf-letter-name {
+  font-weight: 700;
+  font-size: 13pt;
+  margin-bottom: 2mm;
+}
+
+.rf-letter-split .rf-letter-split-contact {
+  margin: 8mm 0;
+}
+
+.rf-letter-split .rf-letter-split-recipient {
+  margin-top: 12mm;
+}
+
+.rf-letter-split .rf-letter-split-title {
+  font-size: 16pt;
+  font-weight: 700;
+  margin: 0 0 6mm 0;
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------------------
+   CV templates (v3 beta). CVs run long, so we relax padding a touch and skip
+   the one-page assumption entirely. Same physical page (A4) as résumés so the
+   preview / print pipeline stays uniform.
+   --------------------------------------------------------------------------- */
+
+.rf-cv {
+  --rf-pad: 16mm;
+  --rf-gap: 4.2mm;
+}
+
+.rf-cv .rf-h2 {
+  border-bottom: 0.5pt solid var(--rf-rule);
+  padding-bottom: 0.6mm;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 10pt;
+}
+
+.rf-cv-academic .rf-cv-head {
+  text-align: center;
+  margin-bottom: 5mm;
+}
+
+.rf-cv-academic .rf-h1 {
+  font-size: 22pt;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+}
+
+.rf-cv-academic .rf-entry {
+  margin-top: 2mm;
+}
+
+.rf-cv-modern .rf-cv-modern-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8mm;
+  padding-bottom: 3mm;
+  border-bottom: 1.5pt solid var(--rf-accent, #1e40af);
+  margin-bottom: 4mm;
+}
+
+.rf-cv-modern .rf-cv-modern-contact {
+  text-align: right;
+  font-size: 9pt;
+  color: var(--rf-muted);
+}
+
+.rf-cv-modern .rf-h2 {
+  color: var(--rf-accent, #1e40af);
+  border-bottom-color: var(--rf-accent, #1e40af);
+}
+
+.rf-cv-european .rf-cv-euro-head {
+  background: #f5f7fb;
+  border-left: 3pt solid var(--rf-accent, #003399);
+  padding: 4mm 5mm;
+  margin: -6mm -6mm 5mm -6mm;
+}
+
+.rf-cv-european .rf-h2 {
+  color: var(--rf-accent, #003399);
+}
+

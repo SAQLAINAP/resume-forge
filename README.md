@@ -5,11 +5,11 @@
 [![Latest release](https://img.shields.io/github/v/release/SAQLAINAP/resume-forge?style=flat-square)](https://github.com/SAQLAINAP/resume-forge/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 
-> Offline-first, ATS-safe résumé builder. Pick from 32 real-world formats, answer only the questions that format needs, get bullet-quality feedback and JD keyword coverage as you type, export as PDF, Word or PNG. No backend, no account, no network call anywhere.
+> Offline-first, ATS-safe résumé builder. 32 résumé formats + 3 cover-letter layouts + 3 academic-CV templates (beta). Import a JSON Resume in a click, share a whole profile as a compressed URL that decodes without a server, keep alternate summaries per application, and export as PDF, Word, PNG or LaTeX / Markdown / HTML. No backend, no account, no network call anywhere.
 
 Most web-based résumé builders emit PDFs that are secretly images and Word files that are secretly HTML tables — both of which shred when an applicant tracking system tries to parse them. Resume Forge treats parseability as the primary constraint: PDFs go through the browser's print pipeline so glyphs stay real, and Word files are constructed from the data model with native headings and bullets rather than converted from the DOM.
 
-Because the whole app is a single web bundle with no external calls, it runs offline as a PWA, installs on Android via [Capacitor](https://capacitorjs.com/), and stores multiple profiles (yours, your family's, your friends') locally in IndexedDB. Switching between the 32 built-in formats reuses your existing profile data — a second résumé takes about a minute. v2 adds undo/redo, an on-device job-description keyword matcher, a rule-based bullet-quality coach and a live one-page fit meter.
+Because the whole app is a single web bundle with no external calls, it runs offline as a PWA, installs on Android via [Capacitor](https://capacitorjs.com/), and stores multiple profiles (yours, your family's, your friends') locally in IndexedDB. Switching between the 32 built-in formats reuses your existing profile data — a second résumé takes about a minute. v2 added undo/redo, an on-device job-description keyword matcher, a rule-based bullet-quality coach and a live one-page fit meter. **v3 extends the same data spine to cover letters, adds offline share links (a profile compressed into the URL hash, decoded on the recipient's device — no server), imports JSON Resume schemas in one click, supports section-level summary variants, ships an academic-CV template family in beta, and adds a beta source editor for LaTeX / Markdown / HTML.**
 
 ![Format gallery with flair filters, live sample-data previews and per-template ATS grade](./docs/screenshots/gallery.png)
 
@@ -105,6 +105,12 @@ Profiles are stored in IndexedDB under the origin. They never leave the device u
 ## Features
 
 - **32 résumé formats** modelled on well-known real-world, university and MBB templates
+- **3 cover-letter layouts** off the same profile — contact block updates flow into every letter
+- **3 academic-CV templates (beta)** with grants, teaching, service and invited-talks sections
+- **Offline share links** — a whole profile compressed into the URL hash, decoded on the recipient's device without any server call
+- **JSON Resume import** — paste an [official JSON Resume](https://jsonresume.org) or a Resume Forge backup, we handle both
+- **Summary variants** — keep several alternate summaries on one profile and pick one per résumé
+- **Source editor (beta)** — render the current profile as LaTeX, Markdown or HTML for Overleaf / a blog / a plain-text portal
 - **Flair-based filtering** (Technical / Research / One Page / India / etc.)
 - **Multi-profile support** with duplicate, import, export and two-step delete
 - **Gap-diffing wizard** that asks only for what the chosen format needs and the profile lacks
@@ -112,35 +118,44 @@ Profiles are stored in IndexedDB under the origin. They never leave the device u
 - **Bullet coach** — rule-based, on-device linter for verb strength, metric use, hedging and length
 - **JD keyword matcher** — paste a posting; token-set overlap runs entirely in-tab
 - **Page fit meter** — reads the live preview to report page count and fill percentage
-- **ATS-safe exports**: PDF (print pipeline), DOCX (data model → native Word), PNG (3× rasterisation for slides)
+- **ATS-safe exports**: PDF (print pipeline), DOCX (data model → native Word), PNG (3× rasterisation for slides), LaTeX / Markdown / HTML (source editor)
 - **Fully offline**: precached service worker, IndexedDB persistence, zero network calls
+- **Vitest pure-logic tests** — `npm test` runs lint, keyword, share round-trip, JSON Resume mapping, variants and source-export tests in under a second
 - Installable as a PWA on any device; wrappable as an Android APK via Capacitor
-- ~116 kB gzip main bundle; the ~350 kB `docx` library is lazy-loaded only when the user clicks *Word*
+- ~127 kB gzip main bundle; the ~350 kB `docx` library is lazy-loaded only when the user clicks *Word*
 
 ## Architecture
 
 ```
 src/
   core/
-    types.ts          data spine — ResumeData, Profile, TemplateMeta
-    schema.ts         field registry; every form is driven from here
-    store.ts          zustand + persist over IndexedDB, plus a 50-entry undo/redo ring
-    completeness.ts   the gap diff that powers the wizard and progress ring
-    lint.ts           bullet-quality rules (verb strength, metric use, hedging)
-    keywords.ts       offline tokeniser + JD ↔ resume set intersection
-    exporters.ts      PDF (print), PNG, JSON, lazy DOCX
-    docx-export.ts    Word document built from the data model (lazy chunk)
+    types.ts             data spine — ResumeData, Profile, TemplateMeta, CoverLetter
+    schema.ts            field registry; every form is driven from here; backfillResumeData powers persist migration
+    store.ts             zustand + persist over IndexedDB, plus a 50-entry undo/redo ring
+    variants.ts          activeSummary(basics) helper — the single lookup templates use
+    completeness.ts      the gap diff that powers the wizard and progress ring
+    lint.ts              bullet-quality rules (verb strength, metric use, hedging)
+    keywords.ts          offline tokeniser + JD ↔ resume set intersection
+    share.ts             CompressionStream / base64url encoder + decoder for /share/:blob
+    import-jsonresume.ts JSON Resume schema → ResumeData mapper
+    source-export.ts     ResumeData → LaTeX / Markdown / HTML (source editor)
+    exporters.ts         PDF (print), PNG, JSON, lazy DOCX (résumé + cover letter)
+    docx-export.ts       Word document built from the data model (lazy chunk)
+    __tests__/           vitest suite for the pure-logic modules
   templates/
-    blocks.tsx        reusable section renderers
-    layouts.tsx       the 32 layouts — pure functions of ResumeData
-    registry.tsx      template metadata: flairs, sections, ATS grade
-  pages/              Gallery, Wizard, Editor, Profiles
+    blocks.tsx           reusable section renderers, including CV-only blocks
+    layouts.tsx          the 32 résumé layouts + 3 CV layouts — all pure functions of ResumeData
+    coverLetters.tsx     the 3 cover-letter layouts (216×279 mm)
+    registry.tsx         template metadata: flairs, sections, ATS grade, kind, beta
+  pages/                 Gallery, Wizard, Editor, Profiles, CoverLetters, CoverLetterEditor, SharedProfile, SourceEditor
   ui/
-    BulletCoach.tsx   grouped findings from lint.ts
-    KeywordMatcher.tsx paste-and-diff panel for a job description
-    PageFitMeter.tsx  ResizeObserver-driven fill/overflow gauge
+    BulletCoach.tsx      grouped findings from lint.ts
+    KeywordMatcher.tsx   paste-and-diff panel for a job description
+    PageFitMeter.tsx     ResizeObserver-driven fill/overflow gauge
+    SummaryVariants.tsx  editor panel for alternate summaries
+    LetterPreview.tsx    scaled preview + print portal for cover letters
     …
-  styles/resume.css   print-first document CSS in mm/pt
+  styles/resume.css      print-first document CSS in mm/pt (résumé, cover letter and CV families)
 ```
 
 App chrome is Tailwind. The résumé document deliberately is not — it is plain CSS in physical units so it survives printing and rasterisation unchanged. Full rationale for each fork is in [DECISIONS.md](./DECISIONS.md).
@@ -150,7 +165,8 @@ App chrome is Tailwind. The résumé document deliberately is not — it is plai
 Ordered by how much each item improves the résumé the user walks away with, not by how interesting it is to build.
 
 - **v2 (shipped)** — 21 new templates, undo/redo, offline JD keyword matcher, rule-based bullet-quality coach, one-page fit meter.
-- **v3** — Cover letters off the same data spine, offline-decodable share links, LinkedIn/JSON Resume import, application tracker, section-level variants, signed release APK, optional opt-in on-device WebGPU LLM.
+- **v3 (shipped)** — cover letters, offline share links, JSON Resume import, summary variants, academic-CV templates (beta), source editor for LaTeX / Markdown / HTML (beta), pure-logic Vitest suite.
+- **v4** — experience-ordering variants, application tracker, LinkedIn CSV importer, source-editor round-trip, signed release APK, optional opt-in on-device WebGPU LLM.
 
 Explicitly not planned: a backend, telemetry, or a drag-and-drop template designer. Full detail in [ROADMAP.md](./ROADMAP.md).
 
@@ -163,6 +179,7 @@ Explicitly not planned: a backend, telemetry, or a drag-and-drop template design
 Issues and PRs are welcome. Before opening a PR, please:
 
 - Run `npm run build` — the CI runs `tsc -b && vite build` and blocks on errors.
+- Run `npm test` — the Vitest suite covers the pure-logic modules; regressions there ship silently otherwise.
 - Skim [DECISIONS.md](./DECISIONS.md); several of the load-bearing choices look strange in isolation and the file exists so you don't have to re-derive them.
 - Keep the offline / no-backend / no-telemetry constraint. Anything that reaches out to a server is out of scope for this project by design.
 

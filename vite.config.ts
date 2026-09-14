@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest/config" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -44,5 +45,13 @@ export default defineConfig({
         manualChunks: (id) => (id.includes('node_modules/docx') ? 'docx' : undefined),
       },
     },
+  },
+  test: {
+    // happy-dom is a lot lighter than jsdom and enough for the pure-logic tests
+    // we care about here (share, importers, store reducers).
+    environment: 'happy-dom',
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    globals: false,
+    css: false,
   },
 })

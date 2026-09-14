@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
 import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval'
 import { nanoid } from 'nanoid'
-import { emptyResumeData } from './schema'
-import type { Profile, ResumeData, SectionKey } from './types'
+import { backfillResumeData, emptyResumeData } from './schema'
+import type { CoverLetter, Profile, ResumeData, SectionKey } from './types'
 
 /**
  * IndexedDB rather than localStorage: resumes with long bullet lists and several
@@ -44,6 +44,12 @@ interface AppState {
   history: History
 
   createProfile: (label: string, relationship: Profile['relationship']) => string
+  /**
+   * v3 addition — used by the JSON Resume importer and the /share link decoder
+   * to insert a fully-formed profile in one step. Returns the id so the caller
+   * can navigate straight to it.
+   */
+  createProfileFromData: (label: string, relationship: Profile['relationship'], data: ResumeData) => string
   deleteProfile: (id: string) => void
   duplicateProfile: (id: string) => string | null
   setActiveProfile: (id: string) => void
@@ -56,6 +62,12 @@ interface AppState {
   removeItem: (id: string, section: SectionKey, itemId: string) => void
   moveItem: (id: string, section: SectionKey, itemId: string, direction: -1 | 1) => void
   replaceData: (id: string, data: ResumeData) => void
+
+  /* -- Cover letters (v3) ---------------------------------------------- */
+  createCoverLetter: (profileId: string, label: string, templateId: string) => string | null
+  updateCoverLetter: (profileId: string, letterId: string, patch: Partial<CoverLetter>) => void
+  deleteCoverLetter: (profileId: string, letterId: string) => void
+  duplicateCoverLetter: (profileId: string, letterId: string) => string | null
 
   undo: () => void
   redo: () => void
@@ -108,6 +120,26 @@ export const useStore = create<AppState>()(
             createdAt: now,
             updatedAt: now,
             data: emptyResumeData(),
+            coverLetters: [],
+          }
+          set((s) => ({
+            history: pushHistory(s),
+            profiles: [...s.profiles, profile],
+            activeProfileId: profile.id,
+          }))
+          return profile.id
+        },
+
+        createProfileFromData: (label, relationship, data) => {
+          const now = new Date().toISOString()
+          const profile: Profile = {
+            id: nanoid(),
+            label: label.trim() || 'Imported profile',
+            relationship,
+            createdAt: now,
+            updatedAt: now,
+            data: backfillResumeData(data),
+            coverLetters: [],
           }
           set((s) => ({
             history: pushHistory(s),
@@ -226,6 +258,78 @@ export const useStore = create<AppState>()(
             profiles: s.profiles.map((p) => (p.id === id ? touch({ ...p, data }) : p)),
           })),
 
+        /* -- Cover letters ------------------------------------------------ */
+
+        createCoverLetter: (profileId, label, templateId) => {
+          const source = get().profiles.find((p) => p.id === profileId)
+          if (!source) return null
+          const now = new Date().toISOString()
+          const letter: CoverLetter = {
+            id: nanoid(),
+            label: label.trim() || 'Untitled letter',
+            templateId,
+            company: '',
+            jobTitle: '',
+            hiringManager: '',
+            hiringAddress: '',
+            date: now.slice(0, 10),
+            greeting: 'Dear Hiring Manager,',
+            body: '',
+            closing: 'Sincerely,',
+            createdAt: now,
+            updatedAt: now,
+          }
+          set((s) => ({
+            history: pushHistory(s),
+            profiles: s.profiles.map((p) =>
+              p.id === profileId
+                ? touch({ ...p, coverLetters: [...(p.coverLetters ?? []), letter] })
+                : p,
+            ),
+          }))
+          return letter.id
+        },
+
+        updateCoverLetter: (profileId, letterId, patch) =>
+          set((s) => ({
+            history: pushHistory(s),
+            profiles: s.profiles.map((p) =>
+              p.id === profileId
+                ? touch({
+                    ...p,
+                    coverLetters: (p.coverLetters ?? []).map((l) =>
+                      l.id === letterId ? { ...l, ...patch, updatedAt: new Date().toISOString() } : l,
+                    ),
+                  })
+                : p,
+            ),
+          })),
+
+        deleteCoverLetter: (profileId, letterId) =>
+          set((s) => ({
+            history: pushHistory(s),
+            profiles: s.profiles.map((p) =>
+              p.id === profileId
+                ? touch({ ...p, coverLetters: (p.coverLetters ?? []).filter((l) => l.id !== letterId) })
+                : p,
+            ),
+          })),
+
+        duplicateCoverLetter: (profileId, letterId) => {
+          const source = get().profiles.find((p) => p.id === profileId)
+          const src = source?.coverLetters?.find((l) => l.id === letterId)
+          if (!source || !src) return null
+          const now = new Date().toISOString()
+          const copy: CoverLetter = { ...structuredClone(src), id: nanoid(), label: `${src.label} (copy)`, createdAt: now, updatedAt: now }
+          set((s) => ({
+            history: pushHistory(s),
+            profiles: s.profiles.map((p) =>
+              p.id === profileId ? touch({ ...p, coverLetters: [...(p.coverLetters ?? []), copy] }) : p,
+            ),
+          }))
+          return copy.id
+        },
+
         undo: () =>
           set((s) => {
             const past = s.history.past.slice()
@@ -260,6 +364,29 @@ export const useStore = create<AppState>()(
         activeProfileId: s.activeProfileId,
         lastTemplateId: s.lastTemplateId,
       }),
+      /**
+       * v3 added CV-only sections (grants, teaching, service, talks), the
+       * summary-variants pair on Basics, and a `coverLetters` array on every
+       * Profile. Migration is additive: backfill defaults for anything missing
+       * so v2 profiles keep working. No version key needed — the fields are
+       * detected structurally.
+       */
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as { profiles?: Partial<Profile>[]; activeProfileId?: string | null; lastTemplateId?: string | null }
+        return {
+          ...p,
+          profiles: (p.profiles ?? []).map((raw) => ({
+            id: raw.id ?? nanoid(),
+            label: raw.label ?? 'Untitled profile',
+            relationship: raw.relationship ?? 'Self',
+            createdAt: raw.createdAt ?? new Date().toISOString(),
+            updatedAt: raw.updatedAt ?? new Date().toISOString(),
+            data: backfillResumeData(raw.data),
+            coverLetters: raw.coverLetters ?? [],
+          })),
+        }
+      },
+      version: 3,
       onRehydrateStorage: () => (state) => state && useStore.setState({ hydrated: true }),
     },
   ),

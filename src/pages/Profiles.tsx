@@ -4,6 +4,8 @@ import { useStore } from '../core/store'
 import { getTemplate } from '../templates/registry'
 import { completenessScore } from '../core/completeness'
 import { exportJson } from '../core/exporters'
+import { encodeProfileShare, shareUrl } from '../core/share'
+import { importJsonResume, looksLikeJsonResume } from '../core/import-jsonresume'
 import { Button, Card, EmptyState, ProgressRing } from '../ui/atoms'
 import type { Profile } from '../core/types'
 
@@ -17,14 +19,14 @@ export function Profiles() {
     deleteProfile,
     duplicateProfile,
     renameProfile,
-    createProfile,
-    replaceData,
+    createProfileFromData,
   } = useStore()
   const fileRef = useRef<HTMLInputElement>(null)
   const [editing, setEditing] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
   const [confirming, setConfirming] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
+  const [sharedLink, setSharedLink] = useState<{ id: string; url: string } | null>(null)
 
   const template = getTemplate(lastTemplateId)
 
@@ -33,6 +35,14 @@ export function Profiles() {
     navigate(`/edit/${template.id}`)
   }
 
+  /**
+   * Accepts three shapes in priority order:
+   *   1. A Resume Forge export (single or array of `{ label, data }`).
+   *   2. A JSON Resume schema object (jsonresume.org). Detected structurally.
+   *   3. Anything else — surfaced as a friendly error.
+   * The importer is one-way (JSON Resume → ResumeData); we don't preserve the
+   * source shape because our data model has fields JSON Resume doesn't.
+   */
   async function handleImport(file: File) {
     setImportError(null)
     try {
@@ -40,14 +50,38 @@ export function Profiles() {
       const entries: Array<{ label?: string; data?: unknown }> = Array.isArray(parsed) ? parsed : [parsed]
       let imported = 0
       for (const entry of entries) {
-        if (!entry?.data || typeof entry.data !== 'object') continue
-        const id = createProfile(entry.label ?? 'Imported profile', 'Other')
-        replaceData(id, entry.data as never)
-        imported += 1
+        if (entry?.data && typeof entry.data === 'object') {
+          createProfileFromData(entry.label ?? 'Imported profile', 'Other', entry.data as never)
+          imported += 1
+          continue
+        }
+        if (looksLikeJsonResume(entry)) {
+          const { label, data } = importJsonResume(entry)
+          createProfileFromData(label, 'Other', data)
+          imported += 1
+          continue
+        }
       }
-      if (imported === 0) setImportError('That file did not contain any profiles we could read.')
+      if (imported === 0) setImportError('No profiles or JSON Resume payload found in that file.')
     } catch {
       setImportError('That file is not valid JSON.')
+    }
+  }
+
+  async function makeShareLink(p: Profile) {
+    setImportError(null)
+    try {
+      const blob = await encodeProfileShare(p)
+      const url = shareUrl(window.location.href, blob)
+      setSharedLink({ id: p.id, url })
+      try {
+        await navigator.clipboard.writeText(url)
+      } catch {
+        // Some browsers (older Safari, non-secure origin) refuse writeText;
+        // we still show the URL below so the user can copy manually.
+      }
+    } catch {
+      setImportError('Could not encode share link — check the browser supports CompressionStream.')
     }
   }
 
@@ -65,7 +99,7 @@ export function Profiles() {
           <input
             ref={fileRef}
             type="file"
-            accept="application/json"
+            accept="application/json,.json"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0]
@@ -73,7 +107,9 @@ export function Profiles() {
               e.target.value = ''
             }}
           />
-          <Button onClick={() => fileRef.current?.click()}>Import</Button>
+          <Button onClick={() => fileRef.current?.click()} title="Resume Forge backup or JSON Resume schema">
+            Import
+          </Button>
           <Button
             onClick={() =>
               exportJson(
@@ -148,6 +184,9 @@ export function Profiles() {
                     <Button size="sm" onClick={() => duplicateProfile(p.id)}>
                       Duplicate
                     </Button>
+                    <Button size="sm" onClick={() => makeShareLink(p)} title="Compress into a URL. Sends nothing.">
+                      Share
+                    </Button>
                     <Button
                       size="sm"
                       onClick={() =>
@@ -175,6 +214,16 @@ export function Profiles() {
                     </Button>
                   </div>
                 </div>
+                {sharedLink?.id === p.id && (
+                  <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-[11px] text-emerald-800 ring-1 ring-emerald-200">
+                    <div className="font-semibold">Share link (copied to clipboard)</div>
+                    <div className="mt-1 break-all font-mono text-[10px]">{sharedLink.url}</div>
+                    <div className="mt-1 text-emerald-700/70">
+                      This encodes the entire profile client-side. Nothing was uploaded — the recipient decodes it in
+                      their browser.
+                    </div>
+                  </div>
+                )}
               </Card>
             )
           })}

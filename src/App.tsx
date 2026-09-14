@@ -3,10 +3,17 @@ import { Gallery } from './pages/Gallery'
 import { Wizard } from './pages/Wizard'
 import { Editor } from './pages/Editor'
 import { Profiles } from './pages/Profiles'
+import { CoverLetters } from './pages/CoverLetters'
+import { CoverLetterEditor } from './pages/CoverLetterEditor'
+import { SharedProfile } from './pages/SharedProfile'
+import { SourceEditor } from './pages/SourceEditor'
 import { useStore } from './core/store'
 
 function Shell({ children }: { children: React.ReactNode }) {
   const profileCount = useStore((s) => s.profiles.length)
+  const letterCount = useStore((s) =>
+    s.profiles.reduce((n, p) => n + (p.coverLetters?.length ?? 0), 0),
+  )
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `rounded-lg px-3 py-1.5 text-sm font-medium transition ${
@@ -29,6 +36,15 @@ function Shell({ children }: { children: React.ReactNode }) {
             </NavLink>
             <NavLink to="/profiles" className={linkClass}>
               Profiles{profileCount > 0 && ` (${profileCount})`}
+            </NavLink>
+            <NavLink to="/cover-letters" className={linkClass}>
+              Cover letters{letterCount > 0 && ` (${letterCount})`}
+            </NavLink>
+            <NavLink to="/source" className={linkClass}>
+              Source
+              <span className="ml-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200 align-middle">
+                Beta
+              </span>
             </NavLink>
           </div>
         </div>
@@ -62,6 +78,10 @@ export default function App() {
             <Route path="/build/:templateId" element={<Wizard />} />
             <Route path="/edit/:templateId" element={<Editor />} />
             <Route path="/profiles" element={<Profiles />} />
+            <Route path="/cover-letters" element={<CoverLetters />} />
+            <Route path="/cover-letter/:id/edit" element={<CoverLetterEditor />} />
+            <Route path="/share/:blob" element={<SharedProfile />} />
+            <Route path="/source" element={<SourceEditor />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Shell>

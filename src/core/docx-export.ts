@@ -8,7 +8,7 @@ import {
   TabStopType,
   TextRun,
 } from 'docx'
-import type { ResumeData, SectionKey } from './types'
+import type { CoverLetter, ResumeData, SectionKey } from './types'
 import { dateRange, joinNonEmpty, prettyUrl, scoreLabel } from './format'
 
 /**
@@ -249,5 +249,89 @@ export async function buildDocx(
     ],
   })
 
+  return Packer.toBlob(doc)
+}
+
+/* -- Cover letter DOCX ----------------------------------------------------- */
+
+/**
+ * Cover letters are structurally simple — a block-format business letter is
+ * sender / date / recipient / greeting / body paragraphs / closing / signature.
+ * We do the same native-primitives rebuild here that we do for the résumé, so
+ * the .docx is a real Word letter with proper paragraph spacing and no
+ * positioned frames. Layout differences between our three letter templates are
+ * screen/PDF-only; the DOCX collapses to one canonical, ATS-safe form.
+ */
+export async function buildLetterDocx(data: ResumeData, letter: CoverLetter): Promise<Blob> {
+  const { basics } = data
+  const paras: Paragraph[] = []
+
+  paras.push(
+    new Paragraph({
+      spacing: { after: 40 },
+      children: [new TextRun({ text: basics.fullName || 'Your Name', bold: true, size: 28, font: FONT })],
+    }),
+  )
+  const contact = joinNonEmpty([basics.email, basics.phone, basics.location], '  •  ')
+  if (contact) {
+    paras.push(
+      new Paragraph({
+        spacing: { after: 240 },
+        children: [new TextRun({ text: contact, size: 19, font: FONT, color: '444444' })],
+      }),
+    )
+  }
+
+  if (letter.date) {
+    paras.push(new Paragraph({ spacing: { after: 240 }, children: [new TextRun({ text: letter.date, size: 20, font: FONT })] }))
+  }
+
+  const recipient = [letter.hiringManager, letter.company, letter.hiringAddress].filter(Boolean)
+  for (const line of recipient) {
+    paras.push(new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: line, size: 20, font: FONT })] }))
+  }
+  if (recipient.length) paras.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun('')] }))
+
+  if (letter.jobTitle) {
+    paras.push(
+      new Paragraph({
+        spacing: { after: 200 },
+        children: [
+          new TextRun({ text: 'Re: ', bold: true, size: 20, font: FONT }),
+          new TextRun({ text: letter.jobTitle, size: 20, font: FONT }),
+        ],
+      }),
+    )
+  }
+
+  if (letter.greeting) {
+    paras.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: letter.greeting, size: 20, font: FONT })] }))
+  }
+
+  for (const para of letter.body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)) {
+    paras.push(
+      new Paragraph({
+        spacing: { after: 160 },
+        children: [new TextRun({ text: para, size: 20, font: FONT })],
+      }),
+    )
+  }
+
+  if (letter.closing) {
+    paras.push(new Paragraph({ spacing: { before: 200, after: 0 }, children: [new TextRun({ text: letter.closing, size: 20, font: FONT })] }))
+  }
+  paras.push(new Paragraph({ spacing: { before: 60, after: 0 }, children: [new TextRun({ text: basics.fullName, bold: true, size: 20, font: FONT })] }))
+
+  const doc = new Document({
+    creator: 'Resume Forge',
+    title: `${basics.fullName} — Cover letter — ${letter.company || 'Application'}`,
+    styles: { default: { document: { run: { font: FONT, size: 20 } } } },
+    sections: [
+      {
+        properties: { page: { margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
+        children: paras,
+      },
+    ],
+  })
   return Packer.toBlob(doc)
 }

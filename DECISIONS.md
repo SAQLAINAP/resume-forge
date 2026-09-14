@@ -289,13 +289,171 @@ Called out in the tooltip.
 
 ---
 
-## Known gaps in v2
+---
+
+## 15. Share links compress a whole profile into the URL hash
+
+**Chosen:** `CompressionStream('deflate-raw')` over UTF-8 JSON, base64url into
+the URL hash. The recipient decodes in-browser on the `/share/:blob` route and
+gets an explicit "Import as new profile" step — nothing is written to their
+store until they consent.
+
+**Rejected:**
+- Uploading the profile to a server and sending a short link. Would violate
+  the whole no-backend promise, and is the single feature that most obviously
+  invites a "just add accounts" scope creep.
+- Plain JSON in the hash. Works but the compression is 3–4× tighter, and
+  browsers start refusing URLs past ~30 kB. A typical résumé JSON is 8–20 kB.
+- The Web Share API. Only shares text/URLs; the payload structure is what we
+  need to preserve.
+
+**Why:** `CompressionStream` has been baseline in every modern browser since
+2023. The blob is opaque — no personal data leaks in the URL preview because
+it's a binary chunk. A tiny `{ v, kind, payload }` envelope lets the decoder
+refuse a future format cleanly instead of silently mangling it.
+
+**Cost:** the URL is long (a few kB). Not human-shareable in Slack without a
+shortener the user provides. Not our problem — the promise is "no server on
+our side", not "URLs fit in 280 characters".
+
+---
+
+## 16. Cover letters are nested on the profile, not their own entity
+
+**Chosen:** a Profile has an optional `coverLetters: CoverLetter[]`. Editing
+the profile's contact block re-flows into every letter under that profile.
+
+**Rejected:** letters as their own top-level entity referencing a profile by id.
+
+**Why:** the mental model is "one person, one file". Anything else means when
+someone updates their phone number the app has to explain "you also need to
+edit each cover letter". Nesting removes the concept of "orphan letter".
+Cost: duplicating a profile duplicates its letters — which is what we want
+(a fork carries its whole state), so no cost in practice.
+
+---
+
+## 17. JSON Resume is the only external import format we accept
+
+**Chosen:** the `Import` button on `/profiles` accepts either a Resume Forge
+backup or a JSON Resume schema object. Detection is structural (`basics ||
+work || education || skills`), not by MIME type.
+
+**Rejected:** shipping importers for LinkedIn CSV, HR-XML, Europass XML, and
+individual builder formats.
+
+**Why:** JSON Resume is the closest thing the ecosystem has to a lingua franca.
+Every other builder either exports to it or can be persuaded to. LinkedIn's
+own export is a bundle of CSVs — a heavier integration for the same "get your
+data in fast" outcome. If we ever add a LinkedIn CSV importer, it lowers into
+this same `importJsonResume` — the internal target format stays the same.
+
+**Cost:** deliberately lossy in one direction — the importer fills what we
+render, drops what we don't (references, interests). This is not a
+round-tripping backup format; use `Back up all` for that.
+
+---
+
+## 18. Section-level variants: summary only for now
+
+**Chosen:** `Basics.summaryVariants: string[]` plus `summaryVariantIndex:
+number | null`. `null` means "use the base summary". Templates read via a
+single helper `activeSummary(basics)`.
+
+**Rejected:** a general N-variants-of-M-fields matrix (variant experience
+orderings, alternate skill groupings, alternate education emphasis).
+
+**Why:** v2's JD-matcher telemetry-free field observation confirmed the
+folk knowledge: the summary is the field people rewrite per application, by
+a wide margin. Experience orderings are second. Everything else is noise —
+skills are edited in place, education never changes.
+
+We shipped exactly what the data says people need. A general variants matrix
+is a big surface (UI, storage, template opt-in per section) that would slow
+us down for uses we haven't verified. v4 adds experience orderings once we've
+seen a quarter of summary-variant usage.
+
+**Cost:** users who want alternate experience orderings today have to
+duplicate the whole profile. Acceptable — duplication is one click.
+
+---
+
+## 19. CV mode ships behind a beta flag
+
+**Chosen:** three CV templates registered with `kind: 'cv'` and `beta: true`.
+The gallery shows both chips. CV-only sections (grants, teaching, service,
+talks) exist on every profile as empty arrays; the résumé templates ignore
+them.
+
+**Rejected:**
+- A separate CV data model. Would double the type surface and the persist
+  migration risk for a family that shares 80% of the résumé fields.
+- Waiting until CV templates are as polished as résumés before shipping.
+
+**Why:** the marginal cost is a few more `SectionKey` entries and three
+components. The `beta` chip is the honest signal — the polish gap between our
+best résumé templates (Jake, Harvard, McKinsey) and the CV templates is real
+and calling it out beats surprising the user.
+
+**Cost:** CV templates run long. We turned off the one-page fit-meter
+implicitly (they're CVs — pages are fine). If a user picks a CV template and
+still expects one-page enforcement they'll be confused. Acceptable — the
+label says "CV" and "beta"; that's enough warning.
+
+---
+
+## 20. Source editor is one-way and read-only
+
+**Chosen:** `/source` renders the current profile as LaTeX, Markdown or HTML.
+Copy or download. No editing back into the profile.
+
+**Rejected:** a two-way source editor where hand-edits in LaTeX flow back into
+`ResumeData`.
+
+**Why:** parsing arbitrary LaTeX / Markdown / HTML back into a structured
+`ResumeData` is a whole compiler project we don't own. The 80% case is "I need
+to hand this to Overleaf / a blog / a portal that only takes plain text" — a
+one-way serialiser does that in a hundred lines and never surprises.
+
+**Cost:** users who want to hand-tweak LaTeX bullets and see the change in the
+in-app preview can't. They can hand-tweak and use Overleaf's own preview,
+which is what they were going to do anyway.
+
+---
+
+## 21. Vitest suite covers pure logic only
+
+**Chosen:** `src/core/__tests__/*.test.ts` covering lint scoring, keyword
+matching, share round-trip, JSON Resume mapping, variants fallback, source
+export escaping. Happy-DOM environment. Runs on `npm test` in under a second.
+
+**Rejected:**
+- Playwright / Cypress end-to-end tests. Skipped for v3 — the pure-logic
+  modules are where regressions bite silently; UI regressions are visible
+  the moment you look at the preview.
+- Testing library / render-based tests for every panel. Would double the
+  test surface for the parts of the app we visually verify every session.
+
+**Why:** the modules under test are the ones where a regression ships silently
+(a share link that doesn't decode, a keyword that stops matching, a bullet
+score that always returns 100). UI code has a preview — visual regressions
+show up before you can miss them.
+
+**Cost:** we don't catch route regressions (a broken `/share/:blob`) or
+store-persistence regressions automatically. Manual smoke test at release time
+covers both.
+
+---
+
+## Known gaps in v3
 
 - PDF filename is still chosen in the browser's print dialog, not by us (§1).
 - Two-column layouts still flatten to one column in Word (§2), by design.
 - Undo history is not persisted across page reloads (§11).
 - Bullet coach flags but does not rewrite (§12).
+- Source editor is one-way (§20) — no round-trip parsing yet.
+- No LinkedIn CSV importer (§17) — JSON Resume is the only interlingua.
 - Signed release APK is still not set up — sideloaded debug APK only.
-- No automated test suite. Manual verification: rendering all 32 templates
-  against sample data, generating .docx and unzipping it to confirm text, and
-  clicking through undo/redo across every editor action.
+- No end-to-end tests, only pure-logic Vitest (§21). Manual smoke covers
+  rendering every template, DOCX/PDF/PNG export, share encode/decode, and
+  cover-letter editor across all three layouts.

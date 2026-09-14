@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Reused across cover letter, share and source-editor forms — a plain
+     bordered input with the same focus ring as the résumé fields. */
+  .input {
+    @apply w-full rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent-500;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;

@@ -136,7 +136,19 @@ export function Gallery() {
                 <div className="flex flex-1 flex-col p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h2 className="text-sm font-semibold text-ink-900">{t.name}</h2>
+                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-ink-900">
+                        {t.name}
+                        {t.kind === 'cv' && (
+                          <span className="rounded-full bg-indigo-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-200">
+                            CV
+                          </span>
+                        )}
+                        {t.beta && (
+                          <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
+                            Beta
+                          </span>
+                        )}
+                      </h2>
                       <p className="text-[11px] text-ink-400">{t.origin}</p>
                     </div>
                     <span

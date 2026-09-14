@@ -5,13 +5,17 @@ import type {
   Education,
   Experience,
   Extracurricular,
+  Grant,
+  InvitedTalk,
   LanguageSkill,
   Position,
   Project,
   Publication,
   ResumeData,
   SectionKey,
+  ServiceRole,
   SkillGroup,
+  TeachingRole,
 } from './types'
 
 export type FieldType = 'text' | 'textarea' | 'date' | 'month' | 'select' | 'bullets' | 'tags' | 'url'
@@ -247,6 +251,73 @@ export const SECTIONS: SectionDef[] = [
     titleOf: (l: LanguageSkill) => l.language || 'New language',
     subtitleOf: (l: LanguageSkill) => l.proficiency,
   },
+  /* -- CV-only sections (v3 beta) --------------------------------------- */
+  {
+    key: 'grants',
+    label: 'Grants & Funding',
+    singular: 'Grant',
+    why: 'Academic CVs treat this as a first-class section — reviewers look for it before publications.',
+    fields: [
+      { key: 'title', label: 'Grant title', type: 'text', required: true },
+      { key: 'funder', label: 'Funder', type: 'text', half: true, placeholder: 'NSF · DFG · SERB' },
+      { key: 'amount', label: 'Amount', type: 'text', half: true, placeholder: '$120,000' },
+      { key: 'role', label: 'Your role', type: 'text', half: true, placeholder: 'PI · Co-PI · Contributor' },
+      { key: 'startDate', label: 'Start', type: 'month', half: true },
+      { key: 'endDate', label: 'End', type: 'month', half: true },
+      { key: 'description', label: 'Detail', type: 'textarea' },
+    ],
+    factory: (): Grant => ({ id: nanoid(), title: '', funder: '', amount: '', startDate: '', endDate: '', role: '', description: '' }),
+    titleOf: (g: Grant) => g.title || 'New grant',
+    subtitleOf: (g: Grant) => [g.funder, g.amount].filter(Boolean).join(' · '),
+  },
+  {
+    key: 'teaching',
+    label: 'Teaching',
+    singular: 'Course',
+    why: 'CV-standard block for anyone who has TAed, guest-lectured or run a course.',
+    fields: [
+      { key: 'course', label: 'Course', type: 'text', required: true, placeholder: 'CS231n — Deep Learning' },
+      { key: 'institution', label: 'Institution', type: 'text', half: true },
+      { key: 'role', label: 'Role', type: 'select', half: true, options: ['Instructor', 'TA', 'Guest', 'Lab', 'Other'] },
+      { key: 'term', label: 'Term', type: 'text', placeholder: 'Fall 2025' },
+      { key: 'description', label: 'Detail', type: 'textarea' },
+    ],
+    factory: (): TeachingRole => ({ id: nanoid(), course: '', institution: '', role: 'TA', term: '', description: '' }),
+    titleOf: (t: TeachingRole) => t.course || 'New course',
+    subtitleOf: (t: TeachingRole) => [t.role, t.institution].filter(Boolean).join(' · '),
+  },
+  {
+    key: 'service',
+    label: 'Academic Service',
+    singular: 'Service role',
+    why: 'Reviewing, committee work, editorships — the parts of a CV that show academic citizenship.',
+    fields: [
+      { key: 'role', label: 'Role', type: 'text', required: true, placeholder: 'Reviewer' },
+      { key: 'organization', label: 'Organisation', type: 'text', half: true, placeholder: 'NeurIPS PC' },
+      { key: 'startDate', label: 'Start', type: 'month', half: true },
+      { key: 'endDate', label: 'End', type: 'month', half: true },
+      { key: 'description', label: 'Detail', type: 'textarea' },
+    ],
+    factory: (): ServiceRole => ({ id: nanoid(), role: '', organization: '', startDate: '', endDate: '', description: '' }),
+    titleOf: (s: ServiceRole) => s.role || 'New service role',
+    subtitleOf: (s: ServiceRole) => s.organization,
+  },
+  {
+    key: 'talks',
+    label: 'Invited Talks',
+    singular: 'Talk',
+    why: 'CVs list keynotes, invited talks and workshop presentations separately from publications.',
+    fields: [
+      { key: 'title', label: 'Talk title', type: 'text', required: true },
+      { key: 'venue', label: 'Venue', type: 'text', half: true, placeholder: 'ICLR Workshop on…' },
+      { key: 'date', label: 'Date', type: 'month', half: true },
+      { key: 'location', label: 'Location', type: 'text', half: true },
+      { key: 'url', label: 'Link', type: 'url', half: true },
+    ],
+    factory: (): InvitedTalk => ({ id: nanoid(), title: '', venue: '', date: '', location: '', url: '' }),
+    titleOf: (t: InvitedTalk) => t.title || 'New talk',
+    subtitleOf: (t: InvitedTalk) => t.venue,
+  },
 ]
 
 export const SECTION_MAP = new Map(SECTIONS.map((s) => [s.key, s]))
@@ -272,6 +343,8 @@ export function emptyResumeData(): ResumeData {
       location: '',
       summary: '',
       links: [],
+      summaryVariants: [],
+      summaryVariantIndex: null,
     },
     education: [],
     experience: [],
@@ -283,6 +356,38 @@ export function emptyResumeData(): ResumeData {
     positions: [],
     extracurriculars: [],
     languages: [],
+    grants: [],
+    teaching: [],
+    service: [],
+    talks: [],
+  }
+}
+
+/**
+ * Persist migration: v2 profiles didn't have the CV sections or variant fields.
+ * When rehydrating an older profile, backfill those with empty defaults so the
+ * rest of the app can treat them as always-present. Non-destructive.
+ */
+export function backfillResumeData(data: Partial<ResumeData> | undefined): ResumeData {
+  const empty = emptyResumeData()
+  if (!data) return empty
+  const basics = { ...empty.basics, ...(data.basics ?? {}) }
+  return {
+    basics,
+    education: data.education ?? [],
+    experience: data.experience ?? [],
+    projects: data.projects ?? [],
+    skills: data.skills ?? [],
+    achievements: data.achievements ?? [],
+    certifications: data.certifications ?? [],
+    publications: data.publications ?? [],
+    positions: data.positions ?? [],
+    extracurriculars: data.extracurriculars ?? [],
+    languages: data.languages ?? [],
+    grants: data.grants ?? [],
+    teaching: data.teaching ?? [],
+    service: data.service ?? [],
+    talks: data.talks ?? [],
   }
 }
 

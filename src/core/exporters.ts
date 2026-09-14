@@ -1,6 +1,6 @@
 import { saveAs } from 'file-saver'
 import { toPng } from 'html-to-image'
-import type { ResumeData, SectionKey } from './types'
+import type { CoverLetter, ResumeData, SectionKey } from './types'
 
 export function safeFileName(name: string, templateName: string, ext: string): string {
   const base = (name || 'resume').trim().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')
@@ -50,6 +50,12 @@ export async function exportDocx(
 ): Promise<void> {
   const { buildDocx } = await import('./docx-export')
   saveAs(await buildDocx(data, sectionOrder), fileName)
+}
+
+/** Cover letter DOCX. Same lazy-import trick as the résumé exporter. */
+export async function exportLetterDocx(data: ResumeData, letter: CoverLetter, fileName: string): Promise<void> {
+  const { buildLetterDocx } = await import('./docx-export')
+  saveAs(await buildLetterDocx(data, letter), fileName)
 }
 
 /* -- JSON backup ----------------------------------------------------------- */

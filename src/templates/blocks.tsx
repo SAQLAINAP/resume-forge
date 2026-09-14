@@ -1,5 +1,6 @@
 import type { ResumeData } from '../core/types'
 import { dateRange, joinNonEmpty, prettyUrl, scoreLabel } from '../core/format'
+import { activeSummary } from '../core/variants'
 import { Authors, Bullets, Row, Section } from './primitives'
 
 /**
@@ -261,11 +262,116 @@ export function LanguagesBlock({ data, title = 'Languages' }: { data: ResumeData
   )
 }
 
-export function SummaryBlock({ data, title = 'Summary' }: { data: ResumeData; title?: string }) {
-  if (!data.basics.summary.trim()) return null
+/* -- CV-only blocks (v3 beta) --------------------------------------------- */
+
+export function GrantsBlock({ data, title = 'Grants & Funding' }: { data: ResumeData; title?: string }) {
+  if (!data.grants.length) return null
   return (
     <Section title={title}>
-      <p>{data.basics.summary}</p>
+      {data.grants.map((g) => (
+        <div className="rf-entry" key={g.id}>
+          <Row
+            left={
+              <>
+                <span className="rf-h3">{g.title}</span>
+                {g.role && <span className="rf-italic rf-small"> — {g.role}</span>}
+              </>
+            }
+            right={dateRange(g.startDate, g.endDate)}
+          />
+          <Row
+            left={
+              <span className="rf-small">
+                {joinNonEmpty([g.funder, g.amount], ' · ')}
+              </span>
+            }
+            right={null}
+          />
+          {g.description && <div className="rf-small rf-muted">{g.description}</div>}
+        </div>
+      ))}
+    </Section>
+  )
+}
+
+export function TeachingBlock({ data, title = 'Teaching' }: { data: ResumeData; title?: string }) {
+  if (!data.teaching.length) return null
+  return (
+    <Section title={title}>
+      {data.teaching.map((t) => (
+        <div className="rf-entry" key={t.id}>
+          <Row
+            left={
+              <>
+                <span className="rf-h3">{t.course}</span>
+                <span className="rf-italic rf-small"> — {t.role}</span>
+              </>
+            }
+            right={t.term}
+          />
+          {t.institution && <div className="rf-small rf-muted">{t.institution}</div>}
+          {t.description && <div className="rf-small rf-muted">{t.description}</div>}
+        </div>
+      ))}
+    </Section>
+  )
+}
+
+export function ServiceBlock({ data, title = 'Academic Service' }: { data: ResumeData; title?: string }) {
+  if (!data.service.length) return null
+  return (
+    <Section title={title}>
+      {data.service.map((s) => (
+        <div className="rf-entry" key={s.id}>
+          <Row
+            left={
+              <>
+                <span className="rf-h3">{s.role}</span>
+                {s.organization && <span className="rf-italic rf-small"> — {s.organization}</span>}
+              </>
+            }
+            right={dateRange(s.startDate, s.endDate)}
+          />
+          {s.description && <div className="rf-small rf-muted">{s.description}</div>}
+        </div>
+      ))}
+    </Section>
+  )
+}
+
+export function TalksBlock({ data, title = 'Invited Talks' }: { data: ResumeData; title?: string }) {
+  if (!data.talks.length) return null
+  return (
+    <Section title={title}>
+      <ul className="rf-bullets">
+        {data.talks.map((t) => (
+          <li key={t.id}>
+            <strong>{t.title}</strong>
+            {t.venue && <span className="rf-muted"> — {t.venue}</span>}
+            {t.location && <span className="rf-muted rf-small"> ({t.location})</span>}
+            {t.date && <span className="rf-muted rf-small">, {dateRange(t.date, t.date).split(' – ')[0]}</span>}
+            {t.url && (
+              <span className="rf-small">
+                {' '}
+                ·{' '}
+                <a className="rf-link" href={t.url}>
+                  {prettyUrl(t.url)}
+                </a>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )
+}
+
+export function SummaryBlock({ data, title = 'Summary' }: { data: ResumeData; title?: string }) {
+  const text = activeSummary(data.basics)
+  if (!text.trim()) return null
+  return (
+    <Section title={title}>
+      <p>{text}</p>
     </Section>
   )
 }

@@ -17,6 +17,16 @@ export interface Basics {
   location: string
   summary: string
   links: Link[]
+  /**
+   * Section-level variants (v3). Alternative summaries the user can swap between
+   * per résumé — kept on Basics because summary is the single field people
+   * actually tailor per application. `summaryVariantIndex === null` means "use
+   * the base summary above"; otherwise it's an index into `summaryVariants`.
+   * Deliberately narrow: we shipped variants for the field the JD matcher told
+   * us gets rewritten most, not the general N-variants-of-M-fields matrix.
+   */
+  summaryVariants?: string[]
+  summaryVariantIndex?: number | null
 }
 
 export interface Education {
@@ -111,6 +121,51 @@ export interface LanguageSkill {
   proficiency: 'Native' | 'Fluent' | 'Professional' | 'Intermediate' | 'Basic'
 }
 
+/* -- CV-only sections (v3, beta) ------------------------------------------- */
+/**
+ * These sections are used by the academic/research CV template family and are
+ * optional on every résumé template — a professional résumé profile will have
+ * empty arrays here and never see the wizard ask for them.
+ */
+
+export interface Grant {
+  id: string
+  title: string
+  funder: string
+  amount: string
+  startDate: string
+  endDate: string
+  role: string
+  description: string
+}
+
+export interface TeachingRole {
+  id: string
+  course: string
+  institution: string
+  role: 'Instructor' | 'TA' | 'Guest' | 'Lab' | 'Other'
+  term: string
+  description: string
+}
+
+export interface ServiceRole {
+  id: string
+  role: string
+  organization: string
+  startDate: string
+  endDate: string
+  description: string
+}
+
+export interface InvitedTalk {
+  id: string
+  title: string
+  venue: string
+  date: string
+  location: string
+  url: string
+}
+
 export interface ResumeData {
   basics: Basics
   education: Education[]
@@ -123,10 +178,45 @@ export interface ResumeData {
   positions: Position[]
   extracurriculars: Extracurricular[]
   languages: LanguageSkill[]
+  /** CV-only. Empty for résumé profiles; used by the academic template family. */
+  grants: Grant[]
+  teaching: TeachingRole[]
+  service: ServiceRole[]
+  talks: InvitedTalk[]
 }
 
 /** Every array-shaped section of ResumeData. Used to drive generic list editors. */
 export type SectionKey = Exclude<keyof ResumeData, 'basics'>
+
+/**
+ * CV-only sections. Kept as a subset of SectionKey (not a separate type) so a
+ * template can list `sections: ['grants', 'teaching', ...]` and the same
+ * completeness/wizard machinery walks them uniformly.
+ */
+export type CvOnlySectionKey = 'grants' | 'teaching' | 'service' | 'talks'
+
+/* -- Cover letters (v3) --------------------------------------------------- */
+/**
+ * A cover letter is a distinct artefact but reuses the profile's contact
+ * information. Storing them on the same Profile keeps the "one person, one
+ * file" mental model — the profile is the person, not the résumé.
+ */
+export interface CoverLetter {
+  id: string
+  label: string
+  templateId: string
+  company: string
+  jobTitle: string
+  hiringManager: string
+  hiringAddress: string
+  date: string
+  greeting: string
+  /** Free-form markdown-lite body. Split on blank lines into paragraphs at render. */
+  body: string
+  closing: string
+  createdAt: ISODate
+  updatedAt: ISODate
+}
 
 export interface Profile {
   id: string
@@ -136,6 +226,8 @@ export interface Profile {
   createdAt: ISODate
   updatedAt: ISODate
   data: ResumeData
+  /** Cover letters written under this profile. Empty on new profiles. */
+  coverLetters?: CoverLetter[]
 }
 
 export type FlairCategory = 'role' | 'seniority' | 'format' | 'origin'
@@ -160,4 +252,12 @@ export interface TemplateMeta {
   columns: 1 | 2
   atsScore: 'excellent' | 'good' | 'fair'
   accent: string
+  /**
+   * Distinguishes résumé, academic CV and cover-letter templates so the gallery
+   * can filter them and the wizard can pick the right form. Default is 'resume'.
+   */
+  kind?: 'resume' | 'cv' | 'letter'
+  /** Beta chip. Set on CV templates and the source editor. */
+  beta?: boolean
 }
+

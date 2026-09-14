@@ -9,6 +9,7 @@ import { Button, Card, ProgressRing } from '../ui/atoms'
 import { Field, FieldGrid } from '../ui/Field'
 import { Preview, PrintSurface } from '../ui/Preview'
 import { LinksEditor } from '../ui/LinksEditor'
+import { SummaryVariants } from '../ui/SummaryVariants'
 import { BulletCoach } from '../ui/BulletCoach'
 import { KeywordMatcher } from '../ui/KeywordMatcher'
 import { PageFitMeter } from '../ui/PageFitMeter'
@@ -210,6 +211,16 @@ export function Editor() {
               </FieldGrid>
               <LinksEditor profileId={profile.id} links={data.basics.links} />
             </div>
+          </Accordion>
+
+          <Accordion
+            id="summary-variants"
+            title="Summary variants"
+            count={(data.basics.summaryVariants ?? []).length}
+            open={open}
+            setOpen={setOpen}
+          >
+            <SummaryVariants profile={profile} />
           </Accordion>
 
           {template.sections.map((key) => {

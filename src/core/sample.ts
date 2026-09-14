@@ -155,4 +155,9 @@ export const SAMPLE_DATA: ResumeData = {
     { id: 'lg2', language: 'Hindi', proficiency: 'Native' },
     { id: 'lg3', language: 'Kannada', proficiency: 'Native' },
   ],
+  // CV-only sections stay empty on the sample résumé profile.
+  grants: [],
+  teaching: [],
+  service: [],
+  talks: [],
 }
