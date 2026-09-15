@@ -111,11 +111,15 @@ const CONSERVATIVE_SECTIONS: SectionKey[] = [
 export const TEMPLATES: TemplateEntry[] = [
   /* -- v1 (kept) ---------------------------------------------------------- */
   {
+    // id kept as 'jake' so v2 saved profiles that reference it still resolve.
+    // Display name renamed to remove the possessive: users kept reading
+    // "Jake's Resume" + preview showing "Ananya Rao" as a mismatch. The origin
+    // line still credits Jake Gutierrez so recognition survives.
     id: 'jake',
-    name: "Jake's Resume",
+    name: 'Overleaf Classic',
     origin: 'Jake Gutierrez · Overleaf',
     blurb:
-      'The single most-used LaTeX resume on the internet. Centred header, hairline rules, brutally efficient one page.',
+      'The single most-used LaTeX resume on the internet — popularised by Jake Gutierrez. Centred header, hairline rules, brutally efficient one page.',
     flairs: ['swe', 'student', 'intern', 'one-page', 'dense', 'photo-free', 'us'],
     sections: ['education', 'experience', 'projects', 'skills', 'achievements'],
     requiredSections: ['education'],

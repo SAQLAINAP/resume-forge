@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Used by adaptive-icon <background> as a solid layer on API 26+. Also
+  referenced by the legacy raster mipmaps we generate so pre-O launchers
+  render the same navy plate the vector background uses.
+-->
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#181B23</color>
 </resources>

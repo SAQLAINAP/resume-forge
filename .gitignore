@@ -15,6 +15,10 @@ dist-ssr
 # Release scratch — release notes are drafted here and uploaded to GitHub Releases
 out/
 
+# Icon-generation stamp — written by scripts/generate-icons.mjs each run,
+# only useful for "have I regenerated since editing the SVG?" checks locally.
+public/.icons.stamp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

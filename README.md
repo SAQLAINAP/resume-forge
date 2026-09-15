@@ -36,7 +36,7 @@ The gap-diffing wizard, showing why the second résumé is fast — the profile 
 
 The editor with live, physically-sized preview. The preview scales rather than reflows, so its line breaks and page boundaries match the printed PDF exactly:
 
-![Editor with Jake's Resume template rendering seeded profile data](./docs/screenshots/editor-jake.png)
+![Editor with the Overleaf Classic template rendering seeded profile data](./docs/screenshots/editor-jake.png)
 
 The same profile switched to the Harvard OCS layout. The blue panel at the top surfaces sections the profile has that this format's layout drops, so nothing is silently lost:
 
@@ -45,6 +45,43 @@ The same profile switched to the Harvard OCS layout. The blue panel at the top s
 Multi-profile management. Everything is stored locally; the "Back up all" and per-profile "Export" buttons emit plain JSON:
 
 ![Profiles page with completeness ring and duplicate / export / delete actions](./docs/screenshots/profiles.png)
+
+### On mobile
+
+The same app compiled to Android via Capacitor and rendered at an iPhone-sized viewport. Every desktop capability is reachable on a phone — the same edit / preview surface, the same undo / redo, the same offline export pipeline. No trimmed "mobile experience" fork; the layout responds and that is the whole story.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-gallery.png" alt="Formats gallery on mobile: search + a Trending strip + Filters button collapses the 22-tag filter wall into a drawer, so the first thing on screen is the template gallery" />
+      <p><em>Gallery — filters collapsed to a search + Trending strip + <strong>Filters</strong> drawer; a <code>Sample</code> chip on each preview signals placeholder content without eating vertical space.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-gallery-filters.png" alt="Same gallery page with the Filters drawer open, showing all 22 tag pills organised into Role / Stage / Format / Region groups" />
+      <p><em>Filters drawer opened — every filter still one tap away, grouped by Role / Stage / Format / Region.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-editor.png" alt="Editor on mobile with completeness ring, template picker, DOCX / Image / PDF export buttons and an Edit / Preview tab bar for the two-column desktop layout" />
+      <p><em>Editor — completeness ring, template picker, DOCX / Image / PDF export, and an Edit ↔ Preview tab bar that collapses the desktop two-column layout onto one screen.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-cover-letters.png" alt="Cover letters page on mobile listing a Stripe letter under the active profile, with layout picker and per-profile 'New letter' controls" />
+      <p><em>Cover letters — every letter lives under a profile, so editing your phone number on the profile propagates to every letter automatically.</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-profiles.png" alt="Profiles page on mobile: completeness ring for each profile plus Duplicate / Share / Export / Delete / Open actions" />
+      <p><em>Profiles — completeness ring, plus Duplicate, Share (offline URL), Export (plain JSON), Delete and Open. Nothing leaves the device.</em></p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./docs/screenshots/mobile-source.png" alt="Source editor (Beta) on mobile showing the current profile serialised to LaTeX, with tabs to switch to Markdown or HTML and a download button" />
+      <p><em>Source editor (Beta) — one-way serialisation of the current profile to LaTeX, Markdown or HTML. Copy or download for any external pipeline.</em></p>
+    </td>
+  </tr>
+</table>
 
 ## Background
 

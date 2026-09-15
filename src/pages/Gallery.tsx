@@ -32,12 +32,21 @@ function groupFlairs(): Array<[Flair['category'], Flair[]]> {
   return order.map((cat) => [cat, FLAIRS.filter((f) => f.category === cat)])
 }
 
+// Trending strip. Kept inline next to the search so the common cases don't
+// require opening the full-filters drawer. Ordering picks one representative
+// filter from each category axis (role, stage, format, region) plus SWE which
+// is the single most-picked role in v2 telemetry-equivalent (session recall).
+const TRENDING_FILTERS = ['swe', 'data', 'student', 'senior', 'one-page', 'us'] as const
+
 export function Gallery() {
   const navigate = useNavigate()
   const profile = useActiveProfile()
   const setLastTemplate = useStore((s) => s.setLastTemplate)
   const [selected, setSelected] = useState<string[]>([])
   const [query, setQuery] = useState('')
+  // Full filter grid is collapsed by default. Users see search + 6 trending
+  // chips + a "More filters" toggle; the wall of 22 pills is opt-in.
+  const [showAllFilters, setShowAllFilters] = useState(false)
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -66,47 +75,116 @@ export function Gallery() {
   const previewData = profile?.data ?? SAMPLE_DATA
   const usingSample = !profile
 
+  // Trending chips minus any that were already selected (avoid duplicating a
+  // chip that's already shown in the "Applied" strip below).
+  const trending = TRENDING_FILTERS.filter((id) => !selected.includes(id))
+    .map((id) => FLAIR_MAP.get(id))
+    .filter((f): f is Flair => Boolean(f))
+
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8">
-      <header className="mb-7">
+    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+      <header className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-ink-900">Choose a format</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-500">
-          Every layout here is a real format used by a real institution or hiring pipeline. Filter by the role
-          you are applying for — the labels tell you what each one is actually built for.
+          Every layout here is a real format used by a real institution or hiring pipeline.
         </p>
       </header>
 
-      <div className="mb-6 space-y-3">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search formats, universities, roles…"
-          className="w-full max-w-md rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
-        />
-        {groupFlairs().map(([cat, flairs]) => (
-          <div key={cat} className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 w-14 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-ink-400">
-              {CATEGORY_LABEL[cat]}
+      {/* Compact filter bar: search + trending chips + "More filters" toggle.
+          The full 22-chip grid is opt-in so the first thing on screen is the
+          template gallery, not a wall of pills. */}
+      <div className="mb-5 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search formats, universities, roles…"
+            className="min-w-0 flex-1 basis-64 rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20"
+          />
+          <button
+            onClick={() => setShowAllFilters((v) => !v)}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition ${
+              showAllFilters || selected.length > 0
+                ? 'border-accent-500/40 bg-accent-500/5 text-accent-700'
+                : 'border-ink-200 bg-white text-ink-600 hover:bg-ink-50'
+            }`}
+            aria-expanded={showAllFilters}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path
+                d="M1 2h10M3 6h6M5 10h2"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            Filters
+            {selected.length > 0 && (
+              <span className="rounded-full bg-accent-600 px-1.5 text-[10px] font-semibold text-white">
+                {selected.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Trending strip — one line, horizontally scrollable on small
+            screens so it never wraps into a second row. */}
+        {!showAllFilters && trending.length > 0 && (
+          <div className="-mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-1">
+            <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+              Trending
             </span>
-            {flairs.map((f) => (
-              <Chip key={f.id} active={selected.includes(f.id)} onClick={() => toggle(f.id)}>
+            {trending.map((f) => (
+              <Chip key={f.id} onClick={() => toggle(f.id)}>
                 {f.label}
               </Chip>
             ))}
           </div>
-        ))}
+        )}
+
+        {/* Applied filters — shown even with the drawer closed so users always
+            see what's narrowing the grid. */}
         {selected.length > 0 && (
-          <button onClick={() => setSelected([])} className="text-xs font-medium text-accent-600 hover:underline">
-            Clear {selected.length} filter{selected.length > 1 ? 's' : ''}
-          </button>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+              Applied
+            </span>
+            {selected.map((id) => {
+              const flair = FLAIR_MAP.get(id)
+              if (!flair) return null
+              return (
+                <Chip key={id} active onClick={() => toggle(id)}>
+                  {flair.label} ×
+                </Chip>
+              )
+            })}
+            <button
+              onClick={() => setSelected([])}
+              className="ml-1 text-[11px] font-medium text-ink-500 hover:text-ink-800 hover:underline"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+
+        {/* Full filter grid — only when the user asks. Grouped by category. */}
+        {showAllFilters && (
+          <div className="space-y-2 rounded-xl border border-ink-200 bg-white p-4">
+            {groupFlairs().map(([cat, flairs]) => (
+              <div key={cat} className="flex flex-wrap items-center gap-1.5">
+                <span className="mr-1 w-14 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+                  {CATEGORY_LABEL[cat]}
+                </span>
+                {flairs.map((f) => (
+                  <Chip key={f.id} active={selected.includes(f.id)} onClick={() => toggle(f.id)}>
+                    {f.label}
+                  </Chip>
+                ))}
+              </div>
+            ))}
+          </div>
         )}
       </div>
-
-      {usingSample && (
-        <p className="mb-4 rounded-lg bg-accent-500/5 px-3 py-2 text-xs text-ink-600 ring-1 ring-accent-500/20">
-          Previews show sample content. Pick a format and we will ask only for what it needs.
-        </p>
-      )}
 
       {visible.length === 0 ? (
         <div className="rounded-xl border border-dashed border-ink-200 px-6 py-16 text-center text-sm text-ink-500">
@@ -131,6 +209,15 @@ export function Gallery() {
                     <Preview template={t} data={previewData} />
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-ink-100 to-transparent" />
+                  {/* Per-card "Sample" marker replaces the page-wide banner —
+                      still signals that the preview isn't real user data, but
+                      lives on the preview itself instead of eating vertical
+                      space above the fold. Only when no profile exists. */}
+                  {usingSample && (
+                    <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-white/80 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-500 ring-1 ring-ink-200 backdrop-blur">
+                      Sample
+                    </span>
+                  )}
                 </button>
 
                 <div className="flex flex-1 flex-col p-4">

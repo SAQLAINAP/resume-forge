@@ -1,10 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Resume Forge">
+  <!-- Navy brand plate. rx=112 matches the Android adaptive-icon rounded-square mask. -->
   <rect width="512" height="512" rx="112" fill="#181b23"/>
-  <rect x="140" y="104" width="232" height="304" rx="20" fill="#ffffff"/>
-  <rect x="176" y="152" width="112" height="20" rx="10" fill="#181b23"/>
-  <rect x="176" y="196" width="160" height="12" rx="6" fill="#b0b8c9"/>
-  <rect x="176" y="228" width="160" height="12" rx="6" fill="#b0b8c9"/>
-  <rect x="176" y="272" width="96" height="14" rx="7" fill="#3d82f6"/>
-  <rect x="176" y="308" width="160" height="12" rx="6" fill="#d5d9e2"/>
-  <rect x="176" y="340" width="128" height="12" rx="6" fill="#d5d9e2"/>
+
+  <!-- Document sheet, centred inside the adaptive-icon safe area (~inner 61%).
+       Off-white so the blue name-bar reads as printed ink. -->
+  <rect x="112" y="80" width="288" height="360" rx="24" fill="#f4f5f8"/>
+
+  <!-- Folded top-right corner — one universal "document" cue that survives the
+       tiny render. Two-tone so the fold reads even without the outline. -->
+  <path d="M352 80 L400 128 L352 128 Z" fill="#d5d9e2"/>
+  <path d="M352 80 L352 128 L400 128"
+        fill="none" stroke="#b4bccd" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Prominent blue name-bar. Anchors the eye at all sizes; this is the icon's
+       silhouette read at 16px. -->
+  <rect x="152" y="176" width="176" height="28" rx="10" fill="#3d82f6"/>
+
+  <!-- Subtitle line -->
+  <rect x="152" y="220" width="120" height="14" rx="7" fill="#9aa4b8"/>
+
+  <!-- Body lines — kept quiet so they don't compete with the blue. -->
+  <g fill="#c9d0dd">
+    <rect x="152" y="272" width="208" height="12" rx="6"/>
+    <rect x="152" y="298" width="208" height="12" rx="6"/>
+    <rect x="152" y="324" width="164" height="12" rx="6"/>
+  </g>
+
+  <!-- Section marker — a small blue tick down the left, hinting at structured
+       (ATS-friendly) sections. Reads as a "bookmark" glance. -->
+  <rect x="112" y="176" width="8" height="60" rx="4" fill="#3d82f6"/>
 </svg>
