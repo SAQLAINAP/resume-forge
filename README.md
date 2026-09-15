@@ -2,6 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Android APK](https://github.com/SAQLAINAP/resume-forge/actions/workflows/android.yml/badge.svg)](https://github.com/SAQLAINAP/resume-forge/actions/workflows/android.yml)
+[![GitHub Pages](https://github.com/SAQLAINAP/resume-forge/actions/workflows/pages.yml/badge.svg)](https://saqlainap.github.io/resume-forge/)
 [![Latest release](https://img.shields.io/github/v/release/SAQLAINAP/resume-forge?style=flat-square)](https://github.com/SAQLAINAP/resume-forge/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 
@@ -93,7 +94,9 @@ The design decisions that follow from that observation — print-CSS PDF over ca
 
 ### Web
 
-Requires Node ≥ 22.
+**Hosted:** <https://saqlainap.github.io/resume-forge/> — the same build, deployed as a PWA on every push to `main`. Open it once with a network connection and the browser's service worker precaches the whole bundle (~812 KiB); every load after that works with the network off. Profiles and cover letters live in IndexedDB, so they survive across offline sessions too. On Chrome / Edge use the address-bar install icon (or Safari → Share → Add to Home Screen on iOS) to install it as a standalone app.
+
+**Local:** requires Node ≥ 22.
 
 ```bash
 git clone https://github.com/SAQLAINAP/resume-forge.git
